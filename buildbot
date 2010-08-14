@@ -1,5 +1,4 @@
 #!/bin/bash
-PATH=$PATH:~/herecura
 cd ~/herecura/
 git pull origin master
 cd "$1"

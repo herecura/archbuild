@@ -1,6 +1,7 @@
 #!/bin/bash
 archb=$(arch)
-bsfile=~/herecura/basesystemlist
+#bsfile=~/herecura/basesystemlist
+bsfile=/home/archbuild/basesystemlist
 dest=/mnt/packages/repo
 thisfolder=`pwd`
 source ../repository

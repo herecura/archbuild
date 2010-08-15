@@ -44,7 +44,6 @@ git
 glib2
 glibc
 gmp
-gnutls
 gpm
 grep
 groff
@@ -69,12 +68,10 @@ libmpc
 libnl
 libpcap
 libsasl
-libtasn1
 libtool
 libusb
 licenses
 linux-api-headers
-linux-firmware
 logrotate
 lvm2
 lzo2

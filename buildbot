@@ -1,3 +1,9 @@
 #!/bin/bash
-cd "$1"
-buildrepo
+if test -e /tmp/buildbot; then
+	echo "another buildbot is running, quitting"
+else
+	touch /tmp/buildbot
+	cd "$1"
+	buildrepo
+	rm -f /tmp/buildbot
+fi

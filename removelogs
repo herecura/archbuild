@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ -e /tmp/buildbot ]; then
+	echo "Wait til build is done"
+else
+	if [ -d ~/herecura/${1} ]; then
+		find ~/herecura/${1}/*/ -maxdepth 1 -name "*.log*" -delete
+	fi
+fi

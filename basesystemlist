@@ -17,13 +17,11 @@ cpio
 cracklib
 cryptsetup
 curl
-dash
 db
 dbus-core
 dcron
 device-mapper
 dhcpcd
-dialog
 diffutils
 e2fsprogs
 elfutils
@@ -44,12 +42,10 @@ git
 glib2
 glibc
 gmp
-gpm
 grep
 groff
 grub
 gzip
-hdparm
 heimdal
 iana-etc
 initscripts
@@ -73,10 +69,8 @@ libusb
 licenses
 linux-api-headers
 logrotate
-lvm2
 lzo2
 m4
-mailx
 make
 man-db
 man-pages
@@ -84,7 +78,6 @@ mdadm
 mercurial
 mkinitcpio
 mkinitcpio-busybox
-mlocate
 module-init-tools
 mpfr
 ncurses
@@ -97,8 +90,6 @@ pacman
 pacman-mirrorlist
 pam
 patch
-pciutils
-pcmciautils
 pcre
 perl
 perl-error
@@ -110,7 +101,6 @@ psmisc
 python2
 readline
 run-parts
-sdparm
 sed
 shadow
 sqlite3
@@ -126,11 +116,8 @@ tzdata
 udev
 udev-compat
 unixodbc
-usbutils
 util-linux-ng
-vi
-vim
-vim-runtime
+vim-slim
 virtualbox-additions
 wget
 which

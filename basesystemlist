@@ -107,7 +107,7 @@ popt
 ppl
 procps
 psmisc
-python
+python2
 readline
 run-parts
 sdparm

@@ -51,8 +51,8 @@ iana-etc
 initscripts
 iputils
 kbd
-kernel26-slk
-kernel26-slk-headers
+kernel26-lts
+kernel26-lts-headers
 less
 libarchive
 libcap
@@ -68,6 +68,7 @@ libtool
 libusb
 licenses
 linux-api-headers
+linux-firmware
 logrotate
 lzo2
 m4

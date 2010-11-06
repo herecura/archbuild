@@ -4,7 +4,7 @@ source repository
 
 packtemp=$(ls -1)
 
-rm -f ${dest}/${repository}.txt
+[ -e ${dest}/${repository}.txt ] && rm -f ${dest}/${repository}.txt
 
 for package in ${packtemp}
 do
@@ -21,3 +21,4 @@ cd ${packagesdir}
 ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)"
 rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)")
 
+rm -f ${dest}/${repository}.txt

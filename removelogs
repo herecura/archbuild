@@ -4,5 +4,6 @@ if [ -e /tmp/buildbot ]; then
 else
 	if [ -d ~/herecura/${1} ]; then
 		find ~/herecura/${1}/*/ -maxdepth 1 -name "*.log*" -delete
+		find ~/herecura/${1}/*/ -maxdepth 1 -name "*logpipe*" -delete
 	fi
 fi

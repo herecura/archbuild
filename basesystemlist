@@ -57,6 +57,7 @@ less
 libarchive
 libcap
 libfetch
+libffi
 libgcrypt
 libgpg-error
 libldap

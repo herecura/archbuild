@@ -67,6 +67,7 @@ libpcap
 libsasl
 libtool
 libusb
+libusb-compat
 licenses
 linux-api-headers
 linux-firmware

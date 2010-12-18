@@ -83,6 +83,7 @@ mkinitcpio
 mkinitcpio-busybox
 module-init-tools
 mpfr
+namcap
 ncurses
 neon
 net-tools

@@ -41,9 +41,9 @@ then
   find -name "${thisfolder##*/}*" -mmin +80 -delete
   repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
   popd
-  for builtpkg in ${packagesdir}/${thisfolder##*/}*; do
-    namcap -i ${builtpkg} > ${builtpkg}.namcap.log
-  done
+  #for builtpkg in ${packagesdir}/${thisfolder##*/}*; do
+    #namcap -i ${builtpkg} > ${builtpkg}.namcap.log
+  #done
 elif [ $mkres -eq 1 ]
 then
   echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"

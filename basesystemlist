@@ -94,6 +94,7 @@ pacman
 pacman-mirrorlist
 pam
 patch
+pciutils
 pcre
 perl
 perl-error

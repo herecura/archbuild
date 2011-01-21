@@ -61,13 +61,17 @@ echo "------------------------------------------------------------"
 sudo mkarchroot -u /data/packages/arch32/root
 sudo mkarchroot -u /data/packages/arch64/root
 
+mkres=1
 source PKGBUILD
 echo "run makepkg for ${thisfolder##*/}"
 for _arch in ${arch[@]}; do
   echo ${_arch}
   buildInChroot ${_arch}
+  [ $? -eq 0 ] && mkres=0
 done
-[ -x /data/packages/SyncRepo ] && (/data/packages/SyncRepo)
-exit;
+if [ $mkres -eq 0 ]; then
+  [ -x /data/packages/SyncRepo ] && (/data/packages/SyncRepo)
+fi
+exit
 
 # vim:set ts=2 sw=2 et:

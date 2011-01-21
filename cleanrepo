@@ -1,5 +1,10 @@
 #!/bin/bash
-dest=/mnt/packages/repo
+if test -e /tmp/buildbot; then
+	echo "buildbot is running, quitting"
+  exit
+fi
+
+dest=/data/packages/repo
 source repository
 
 packtemp=$(ls -1)
@@ -14,11 +19,20 @@ do
 	fi
 done
 
-packagesdir=${dest}/${repo}
-
+function cleanRepo() {
+[ "$1" = "" ] return 1
+packagesdir=${dest}/${repository}/${1}
 cd ${packagesdir}
-
 ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)"
 rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)")
+}
+
+if [ "${rarch}" = "any" ]; then
+	cleanRepo any
+else
+	for _arch in ${rarch}; do
+		cleanRepo ${_arch}
+	done
+fi
 
 rm -f ${dest}/${repository}.txt

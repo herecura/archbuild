@@ -1,11 +1,10 @@
 #!/bin/bash
-archb=$(arch)
-bsfile=/home/archbuild/basesystemlist
-dest=/mnt/packages/repo
+
+## init
+dest=/data/packages/repo
 thisfolder=`pwd`
 source ../repository
-
-packagesdir=${dest}/${repo}
+packagesdir=${dest}/${repository}
 if [ -d ${packagesdir} ]; then
   echo "packagesdir exists"
 else
@@ -18,42 +17,56 @@ else
   fi
 fi
 
+## build function
+function buildInChroot() {
+if [ "$1" == "any" ]; then
+  _arch=$1
+  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+elif [ "$1" == "x86_64" ]; then
+  _arch=$1
+  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+elif [ "$1" == "i686" ]; then
+  _arch=$1
+  buildx="linux32 sudo makechrootpkg-ike -c -r /data/packages/arch32"
+else
+  _arch='any'
+  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+fi
+fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
+if [ -e "${packagesdir}/${_arch}/${fullpkg}" ]; then
+  echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"
+  return 1
+else
+  PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
+  if [ $? -eq 0 ]; then
+    echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
+    rm -f *.log*
+    pushd ${packagesdir}/${_arch}
+    find -name "${thisfolder##*/}*" -mmin +80 -delete
+    repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
+    popd
+  else
+    echo "package ${thisfolder##*/}-${pkgver} .pkg failed"
+  fi
+  return 0
+fi
+return 0
+}
+
+## main
 echo "------------------------------------------------------------"
 echo "Update System"
 echo "------------------------------------------------------------"
-sudo pacman -Syu --noconfirm
+sudo mkarchroot -u /data/packages/arch32/root
+sudo mkarchroot -u /data/packages/arch64/root
 
 source PKGBUILD
 echo "run makepkg for ${thisfolder##*/}"
-mkres=9
-if [ $keepsource -eq 1 ]; then
-  PKGDEST=${packagesdir} makepkg -s --log --noconfirm $@
-  mkres=$?
-else
-  PKGDEST=${packagesdir} makepkg -s -c --log --noconfirm $@
-  mkres=$?
-fi
-if [ $mkres -eq 0 ]
-then
-  echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
-  rm -f *.log*
-  pushd ${packagesdir}
-  find -name "${thisfolder##*/}*" -mmin +80 -delete
-  repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
-  popd
-  #for builtpkg in ${packagesdir}/${thisfolder##*/}*; do
-    #namcap -i ${builtpkg} > ${builtpkg}.namcap.log
-  #done
-elif [ $mkres -eq 1 ]
-then
-  echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"
-elif [ $mkres -eq 2 ]
-then
-  echo "package ${thisfolder##*/}-${pkgver} .pkg failed"
-else
-  echo "package ${thisfolder##*/}-${pkgver} .pkg something very strange happend"
-fi
-rm -f *.pkg.*
-cleansystem
+for _arch in ${arch[@]}; do
+  echo ${_arch}
+  buildInChroot ${_arch}
+done
+[ -x /data/packages/SyncRepo ] && (/data/packages/SyncRepo)
+exit;
 
 # vim:set ts=2 sw=2 et:

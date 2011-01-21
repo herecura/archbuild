@@ -2,6 +2,7 @@
 if test -e /tmp/buildbot; then
 	echo "another buildbot is running, quitting"
 else
+	PATH=$PATH:~/archbuild
 	touch /tmp/buildbot
 	cd "$1"
 	buildrepo

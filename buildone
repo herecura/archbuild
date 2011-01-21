@@ -5,17 +5,6 @@ dest=/data/packages/repo
 thisfolder=`pwd`
 source ../repository
 packagesdir=${dest}/${repository}
-if [ -d ${packagesdir} ]; then
-  echo "packagesdir exists"
-else
-  mkdir -p $packagesdir
-  if [ $? -eq 0 ]; then
-    echo "packagesdir created"
-  else
-    echo "failed to create packagesdir EXIT"
-    exit
-  fi
-fi
 
 ## build function
 function buildInChroot() {
@@ -37,6 +26,17 @@ if [ -e "${packagesdir}/${_arch}/${fullpkg}" ]; then
   echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"
   return 1
 else
+  if [ -d ${packagesdir}/${_arch} ]; then
+    echo "packagesdir exists"
+  else
+    mkdir -p ${packagesdir}/${_arch}
+    if [ $? -eq 0 ]; then
+      echo "packagesdir created"
+    else
+      echo "failed to create packagesdir EXIT"
+      return 3
+    fi
+  fi
   PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
@@ -47,6 +47,7 @@ else
     popd
   else
     echo "package ${thisfolder##*/}-${pkgver} .pkg failed"
+    return 2
   fi
   return 0
 fi

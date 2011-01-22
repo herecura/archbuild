@@ -4,7 +4,7 @@
 dest=/data/packages/repo
 thisfolder=`pwd`
 source ../repository
-packagesdir=${dest}/${repository}
+packagesdir=${dest}/${repository/-any/}
 
 ## build function
 function buildInChroot() {

@@ -1,7 +1,7 @@
 #!/bin/bash
+source $(dirname $0)/config
 
 ## init
-dest=/data/packages/repo
 thisfolder=`pwd`
 source ../repository
 packagesdir=${dest}/${repository/-any/}
@@ -10,16 +10,16 @@ packagesdir=${dest}/${repository/-any/}
 function buildInChroot() {
 if [ "$1" == "any" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
 elif [ "$1" == "x86_64" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
 elif [ "$1" == "i686" ]; then
   _arch=$1
-  buildx="linux32 sudo makechrootpkg-ike -c -r /data/packages/arch32"
+  buildx="linux32 sudo makechrootpkg-ike -c -r ${arch32}"
 else
   _arch='any'
-  buildx="sudo makechrootpkg-ike -c -r /data/packages/arch64"
+  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
 fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
 if [ -e "${packagesdir}/${_arch}/${fullpkg}" ]; then
@@ -37,7 +37,7 @@ else
       return 3
     fi
   fi
-  SRCDEST=/data/packages/sources PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
+  SRCDEST=${sourcesdir} PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
     rm -f *.log*
@@ -58,8 +58,8 @@ return 0
 echo "------------------------------------------------------------"
 echo "Update System"
 echo "------------------------------------------------------------"
-sudo mkarchroot -u /data/packages/arch32/root
-sudo mkarchroot -u /data/packages/arch64/root
+sudo mkarchroot -u ${arch32}/root
+sudo mkarchroot -u ${arch64}/root
 
 mkres=1
 source PKGBUILD
@@ -70,7 +70,7 @@ for _arch in ${arch[@]}; do
   [ $? -eq 0 ] && mkres=0
 done
 if [ $mkres -eq 0 ]; then
-  [ -x /data/packages/SyncRepo ] && (/data/packages/SyncRepo)
+  [ -x ${SyncRepo} ] && (${SyncRepo})
 fi
 exit
 

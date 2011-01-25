@@ -21,6 +21,11 @@ else
   _arch='any'
   buildx="sudo makechrootpkg-ike -c -r ${arch64}"
 fi
+if [ ${keepsource} -eq 1 ]; then
+  buildx="{buildx} -- --log"
+else
+  buildx="{buildx} -- -c --log"
+fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
 if [ -e "${packagesdir}/${_arch}/${fullpkg}" ]; then
   echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"

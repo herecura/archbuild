@@ -1,10 +1,11 @@
 #!/bin/bash
+source $(dirname $0)/config
+
 if test -e /tmp/buildbot; then
 	echo "buildbot is running, quitting"
   exit
 fi
 
-dest=/data/packages/repo
 source repository
 
 packtemp=$(ls -1)
@@ -21,7 +22,7 @@ done
 
 function cleanRepo() {
 [ "$1" = "" ] return 1
-packagesdir=${dest}/${repository}/${1}
+packagesdir=${dest}/${repository/-any/}/${1}
 cd ${packagesdir}
 ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)"
 rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)")
@@ -36,3 +37,5 @@ else
 fi
 
 rm -f ${dest}/${repository}.txt
+
+regenrepo clean

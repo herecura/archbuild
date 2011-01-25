@@ -1,0 +1,16 @@
+#!/bin/bash
+PATH=$PATH:$(dirname $0)
+
+# path
+rpdir=~/herecura
+dest=/data/packages/repo
+
+# sources path
+sourcesdir=/data/packages/sources
+
+# chroot paths
+arch32=/data/packages/arch32
+arch64=/data/packages/arch64
+
+# SyncRepo
+SyncRepo=/data/packages/SyncRepo

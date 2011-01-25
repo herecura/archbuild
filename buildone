@@ -45,6 +45,7 @@ else
   SRCDEST=${sourcesdir} PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
+    rm -f *.pkg.* # remove symlinks
     rm -f *.log*
     pushd ${packagesdir}/${_arch}
     find -name "${thisfolder##*/}*" -mmin +80 -delete

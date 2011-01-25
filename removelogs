@@ -1,9 +1,12 @@
 #!/bin/bash
+source $(dirname $0)/config
+
 if [ -e /tmp/buildbot ]; then
 	echo "Wait til build is done"
 else
-	if [ -d ~/herecura/${1} ]; then
-		find ~/herecura/${1}/*/ -maxdepth 1 -name "*.log*" -delete
-		find ~/herecura/${1}/*/ -maxdepth 1 -name "*logpipe*" -delete
+	[ "$1" = "" ] exit 1
+	if [ -d ${rpdir}/${1} ]; then
+		find ${rpdir}/${1}/*/ -maxdepth 1 -name "*.log*" -delete
+		find ${rpdir}/${1}/*/ -maxdepth 1 -name "*logpipe*" -delete
 	fi
 fi

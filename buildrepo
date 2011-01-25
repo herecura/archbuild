@@ -1,4 +1,6 @@
 #!/bin/bash
+source $(dirname $0)/config
+
 curdir=$(pwd)
 
 folders=$(ls -1 ${curdir})

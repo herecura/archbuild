@@ -26,4 +26,3 @@ else
 		regenRepo ${_arch} $1
 	done
 fi
-${SyncRepo}

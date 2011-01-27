@@ -8,5 +8,6 @@ else
 	touch /tmp/buildbot
 	cd ${rpdir}/${1}
 	buildrepo
+	[ $? -eq 0 ] && syncrepo
 	rm -f /tmp/buildbot
 fi

@@ -16,4 +16,4 @@ do
     cd ${curdir}
   fi
 done
-
+exit 0

@@ -75,9 +75,6 @@ for _arch in ${arch[@]}; do
   buildInChroot ${_arch}
   [ $? -eq 0 ] && mkres=0
 done
-if [ $mkres -eq 0 ]; then
-  [ -x ${SyncRepo} ] && (${SyncRepo})
-fi
 exit
 
 # vim:set ts=2 sw=2 et:

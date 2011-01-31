@@ -13,4 +13,4 @@ arch32=/data/packages/arch32
 arch64=/data/packages/arch64
 
 # SyncRepo
-SyncRepo=/data/packages/SyncRepo
+SyncRepo=~/bin/SyncRepo

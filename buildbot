@@ -6,6 +6,10 @@ if test -e /tmp/buildbot; then
 else
 	[ "$1" = "" ] && exit 1
 	touch /tmp/buildbot
+	cd ${rpdir}
+	git checkout master
+	git checkout *
+	git pull origin master
 	cd ${rpdir}/${1}
 	buildrepo
 	[ $? -eq 0 ] && syncrepo

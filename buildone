@@ -8,18 +8,76 @@ packagesdir=${dest}/${repository/-any/}
 
 ## build function
 function buildInChroot() {
+install_what=""
+if [ ${#makedepends[@]} -gt 0 ]; then
+  for dp in ${makedepends[@]}; do
+    case ${dp} in
+      git)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}git"
+        ;;
+      subversion)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}subversion"
+        ;;
+      mercurial)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}mercurial"
+        ;;
+      bzr)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}bzr"
+        ;;
+      arch)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}arch"
+        ;;
+      darcs)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}darcs"
+        ;;
+      cvs)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}cvs"
+        ;;
+      monotone)
+        if [ "${install_what}" != "" ]; then
+          install_what="${install_what} "
+        fi
+        install_what="${install_what}monotone"
+        ;;
+    esac
+  done
+fi
+if [ "$install_what" != "" ]; then
+  install_before=" -y '${install_what}'"
+fi
 if [ "$1" == "any" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
+  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
 elif [ "$1" == "x86_64" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
+  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
 elif [ "$1" == "i686" ]; then
   _arch=$1
-  buildx="linux32 sudo makechrootpkg-ike -c -r ${arch32}"
+  buildx="linux32 sudo makechrootpkg-ike -c${install_before} -r ${arch32}"
 else
   _arch='any'
-  buildx="sudo makechrootpkg-ike -c -r ${arch64}"
+  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
 fi
 if [ ${keepsource} -eq 1 ]; then
   buildx="${buildx} -- --log"
@@ -75,6 +133,6 @@ for _arch in ${arch[@]}; do
   buildInChroot ${_arch}
   [ $? -eq 0 ] && mkres=0
 done
-exit
+exit ${mkres}
 
 # vim:set ts=2 sw=2 et:

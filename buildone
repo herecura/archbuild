@@ -85,7 +85,7 @@ else
   buildx="${buildx} -- -c --log"
 fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
-if [ -e "${packagesdir}/${_arch}/${fullpkg}" ]; then
+if [[ ${testing} -eq 0 && -e "${packagesdir}/${_arch}/${fullpkg}" ]]; then
   echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"
   return 1
 else

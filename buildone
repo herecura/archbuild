@@ -100,7 +100,7 @@ else
       return 3
     fi
   fi
-  SRCDEST=${sourcesdir} PKGDEST=${packagesdir}/${_arch} ${buildx} -- --log
+  SRCDEST=${sourcesdir} PKGDEST=${packagesdir}/${_arch} ${buildx}
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
     rm -f *.pkg.* # remove symlinks

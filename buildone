@@ -104,7 +104,7 @@ else
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
     rm -f *.pkg.* # remove symlinks
-    rm -f *.log*
+    rm -f *.log{,.*}
     pushd ${packagesdir}/${_arch}
     find -name "${thisfolder##*/}*" -mmin +80 -delete
     repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*

@@ -68,16 +68,16 @@ if [ "$install_what" != "" ]; then
 fi
 if [ "$1" == "any" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
+  buildx="build64 -c${install_before}"
 elif [ "$1" == "x86_64" ]; then
   _arch=$1
-  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
+  buildx="build64 -c${install_before}"
 elif [ "$1" == "i686" ]; then
   _arch=$1
-  buildx="linux32 sudo makechrootpkg-ike -c${install_before} -r ${arch32}"
+  buildx="build32 -c${install_before}"
 else
   _arch='any'
-  buildx="sudo makechrootpkg-ike -c${install_before} -r ${arch64}"
+  buildx="build64 -c${install_before}"
 fi
 if [ ${keepsource} -eq 1 ]; then
   buildx="${buildx} -- --log"
@@ -117,13 +117,6 @@ else
 fi
 return 0
 }
-
-## main
-echo "------------------------------------------------------------"
-echo "Update System"
-echo "------------------------------------------------------------"
-sudo mkarchroot -u ${arch32}/root
-sudo mkarchroot -u ${arch64}/root
 
 mkres=1
 source PKGBUILD

@@ -1,0 +1,10 @@
+#!/bin/bash
+source $(dirname $0)/config
+
+sudo mkarchroot -u ${arch64}/root
+
+## init
+thisfolder=`pwd`
+sudo makechrootpkg-ike -r ${arch64} $@
+
+# vim:set ts=2 sw=2 et:

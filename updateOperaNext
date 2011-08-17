@@ -1,0 +1,194 @@
+#!/bin/bash
+source $(dirname $0)/config
+
+cd ${rpdir}
+
+cd herecura-testing/opera-next
+
+# 
+# This script page scrapes the Opera Desktop Team Blog to check for the
+# latest available Opera Next snapshot. This information is then used
+# to create an Arch Linux source package (containing a PKGBUILD) based
+# on that information. 
+#
+# To use, save it to a suitable directory, make the script executable:
+# 
+# chmod +x opsnap4arch
+#
+# and then run it:
+#
+# ./opsnap4arch
+#
+# The script will then print back the details of the latest Opera Next 
+# snapshot found and create an Arch source package, if one is not 
+# already present.
+#
+# If you have questions please ask here:
+# http://my.opera.com/ruario/blog/2011/08/04/getting-the-latest-opera-next-arch-pkgbuild-when-the-aur-is-outdated
+
+
+# Check that a suitable downloader is available. Wget is used by Arch's
+# pkgtools but in case this changes it is best to check it is 
+# available. Furthermore a user might want to run this script on 
+# another distro, prior to transfering the resultant package to one or
+# more Arch Linux installs.
+available()
+{
+	command -v $1 >/dev/null 2>&1
+}
+
+if available wget
+then
+	dwnld="wget -qO-"
+elif available curl
+then
+	dwnld="curl -s"
+elif available lynx
+then
+	dwnld="lynx --source"
+else
+	echo "No suitable downloader found. Install Wget or cURL before trying again."
+	exit 1
+fi
+
+# Get details of the latest Opera Next snapshot by page scraping the 
+# Desktop Team Blog
+opranver=$(${dwnld} http://my.opera.com/desktopteam/blog/ | sed -nr "s,.*http://snapshot.opera.com/unix/([a-zA-Z0-9]+_[0-9][0-9]\.[0-9][0-9]-[0-9]+).*,\1,p" | head -n 1)
+
+# Verify that that the value is set in case of a connection problem
+if [ -z "${opranver}" ]; then
+	echo "There were problems working out what the latest Opera version is."
+	echo "If you are having connection problems. Try again later."
+	exit 1
+fi
+
+# Set version number, build number and URL randomizer based on the
+# collected information.
+opvernr=$(echo ${opranver} | sed -r "s,.*_([0-9][0-9]\.[0-9][0-9])-[0-9]+$,\1,")
+opbldnr=$(echo ${opranver} | sed -r "s,.*_[0-9][0-9]\.[0-9][0-9]-([0-9]+)$,\1,")
+oprandom=$(echo ${opranver} | sed -r "s,^([a-zA-Z0-9]+)_.*,\1,")
+
+# Echo back the latest snapshot
+echo The latest snapshot appears to be: ${opvernr}-${opbldnr}
+
+# Gather information from the md5sum file and again verify that it was
+# collected successfully.
+checksumdefined ()
+{
+	if [ -z "${2}" ]; then
+		echo "Could not work out the md5sum for the ${1}-bit build"
+		cleanup
+		exit 1
+	fi
+}
+
+${dwnld} http://snapshot.opera.com/unix/${opranver}/md5sums > md5sums
+
+op32md5=$(sed -rn "s,^([a-zA-Z0-9]{32})  opera-next-${opvernr}.${opbldnr}\.i386\.linux\.tar\.xz$,\1,p" md5sums)
+checksumdefined 32 ${op32md5} 
+
+op64md5=$(sed -rn "s,^([a-zA-Z0-9]{32})  opera-next-${opvernr}.${opbldnr}\.x86_64\.linux\.tar\.xz$,\1,p" md5sums)
+checksumdefined 64 ${op64md5}
+
+rm -f md5sums
+
+# Create Arch source package
+cat <<EOP > PKGBUILD
+# Maintainer: ruario 
+# Contributor: RobertMe
+# Contributor: BlackEagle
+# Contributor: Skunnyk
+# Contributor: totoloco
+pkgname=opera-next # Set to opera if you want to replace your main/stable build
+_bigrelease=${opvernr}
+_buildver=${opbldnr}
+_randomizer=${oprandom}
+pkgver=\${_bigrelease}_\${_buildver}
+pkgrel=1
+pkgdesc="A fast and secure web browser and Internet suite. Alpha version."
+url="http://my.opera.com/desktopteam/blog/"
+depends=('gcc-libs' 'libxt' 'freetype2' 'libxext')
+replaces=('opera-devel')
+optdepends=('gtk2: GTK integration'
+	    'kdebase-runtime: KDE4+ integration'
+	    'gstreamer0.10-base-plugins: HTML5 open codecs support'
+	    'gstreamer0.10-good: HTML5 open codecs support'
+	    'gstreamer0.10-ffmpeg: HTML5 not so open codecs support'
+	    'gstreamer0.10-bad-plugins: HTML5 not so open codecs support')
+install=opera-next.install
+options=(!strip !zipman)
+license=('custom:opera')
+arch=('i686' 'x86_64')
+_arch=i386
+[ "\$CARCH" = "x86_64" ] && _arch=x86_64
+source=(http://snapshot.opera.com/unix/\${_randomizer}_\${_bigrelease}-\${_buildver}/opera-next-\${_bigrelease}-\${_buildver}.\${_arch}.linux.tar.xz)
+md5sums=('${op32md5}')
+[ "\$CARCH" = "x86_64" ] && md5sums=('${op64md5}')
+
+# Uncomment the following line, if you want your User Agent to include Arch Linux.
+_opdistro="Arch Linux"
+
+package() {
+
+	# 'Install' Opera into \$pkgdir
+	opera-next-\${_bigrelease}-\${_buildver}.\${_arch}.linux/install --prefix /usr --name \${pkgname} --repackage "\${pkgdir}/usr"
+	install -D -m 644 "\${pkgdir}/usr/share/\${pkgname}/defaults/license.txt" "\${pkgdir}/usr/share/licenses/\${pkgname}/license.txt"
+
+	# Insert an Arch User Agent string if set
+	if [ -n "\${_opdistro}" ]
+	then
+		mkdir -p "\${pkgdir}/usr/share/\${pkgname}/custom/defaults"
+		echo "[ISP]" > "\${pkgdir}/usr/share/\${pkgname}/custom/defaults/operaprefs.ini"
+		echo "Id=\${_opdistro}" >> "\${pkgdir}/usr/share/\${pkgname}/custom/defaults/operaprefs.ini"
+		chmod 644 "\${pkgdir}/usr/share/\${pkgname}/custom/defaults/operaprefs.ini"
+	fi
+}
+EOP
+
+cat <<EOS > opera-next.install
+available()
+{
+	command -v \$1 >/dev/null 2>&1
+}
+
+integration() {
+
+	# Setup Menus
+	if available update-desktop-database
+	then
+		update-desktop-database -q /usr/share/applications
+	fi
+
+	# Setup MIME types
+	if available update-mime-database
+	then
+		update-mime-database /usr/share/mime >/dev/null
+	fi
+
+	# Setup Icons
+	touch -c /usr/share/icons/hicolor
+	if available gtk-update-icon-cache
+	then
+		gtk-update-icon-cache -tq /usr/share/icons/hicolor
+	fi
+
+}
+
+post_install() {
+	integration
+}
+
+post_upgrade() {
+	integration
+}
+
+post_remove() {
+	integration
+}
+EOS
+
+cd ${rpdir}
+git add herecura-testing/opera-next
+git commit -sm "opera-next :: ${opvernr} ${opbldnr}"
+
+(cd herecura-testing/opera-next; buildone)

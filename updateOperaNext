@@ -191,4 +191,6 @@ cd ${rpdir}
 git add herecura-testing/opera-next
 git commit -sm "opera-next :: ${opvernr} ${opbldnr}"
 
+git push origin master
+
 (cd herecura-testing/opera-next; buildone)

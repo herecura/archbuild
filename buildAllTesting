@@ -1,3 +1,14 @@
 #!/bin/bash
+source $(dirname $0)/config
+
+cd ${rpdir}
+
 buildbot herecura-testing-any
 buildbot herecura-testing
+
+git add herecura-testing-any
+git add herecura-testing
+
+git commit -sm "testing :: autoupdated $(date +%Y%m%d)"
+
+git push origin master

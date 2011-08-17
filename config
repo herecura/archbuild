@@ -3,14 +3,14 @@ PATH=$PATH:$(dirname $0)
 
 # path
 rpdir=~/herecura
-dest=/data/packages/repo
+dest=~/repo
 
 # sources path
-sourcesdir=/data/packages/sources
+sourcesdir=~/sources
 
 # chroot paths
-arch32=/data/packages/arch32
-arch64=/data/packages/arch64
+arch32=/home/build/.chroots/arch32
+arch64=/home/build/.chroots/arch64
 
 # SyncRepo
 SyncRepo=~/bin/SyncRepo

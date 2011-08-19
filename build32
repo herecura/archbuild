@@ -5,6 +5,6 @@ sudo mkarchroot -u ${arch32}/root
 
 ## init
 thisfolder=`pwd`
-linux32 sudo makechrootpkg-ike -r ${arch32} $@
+SRCDEST=${sourcesdir} linux32 sudo makechrootpkg-ike -r ${arch32} $@
 
 # vim:set ts=2 sw=2 et:

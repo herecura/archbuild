@@ -1,6 +1,10 @@
 #!/bin/bash
 source $(dirname $0)/config
 
+if [ ! -z "$1" ]; then
+  cd "$1"
+fi
+
 ## init
 thisfolder=`pwd`
 source ../repository
@@ -100,7 +104,7 @@ else
       return 3
     fi
   fi
-  SRCDEST=${sourcesdir} PKGDEST=${packagesdir}/${_arch} ${buildx}
+  PKGDEST=${packagesdir}/${_arch} ${buildx}
   if [ $? -eq 0 ]; then
     echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
     rm -f *.pkg.* # remove symlinks

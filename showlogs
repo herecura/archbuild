@@ -1,0 +1,5 @@
+#!/bin/bash
+source $(dirname $0)/config
+
+cd ${rpdir}
+find -name "*.log" | sed 's/\.\///g'

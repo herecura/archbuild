@@ -1,51 +1,11 @@
 #!/bin/bash
 source $(dirname $0)/config
 
-function month {
-case "$1" in
-	Jan)
-		echo "01"
-	;;
-	Feb)
-		echo "02"
-	;;
-	Mar)
-		echo "03"
-	;;
-	Apr)
-		echo "04"
-	;;
-	May)
-		echo "05"
-	;;
-	Jun)
-		echo "06"
-	;;
-	Jul)
-		echo "07"
-	;;
-	Aug)
-		echo "08"
-	;;
-	Sep)
-		echo "09"
-	;;
-	Oct)
-		echo "10"
-	;;
-	Nov)
-		echo "11"
-	;;
-	Dec)
-		echo "12"
-	;;
-esac
-}
-
 cd ${rpdir}
 git pull origin master
 
 mainfolder="${rpdir}/herecura-stable-any"
+date=$(date +%Y%m%d)
 
 # adblock main
 (
@@ -54,16 +14,14 @@ filename='urlfilter-main.ini'
 rm -f ${filename}
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/urlfilter.ini
 if [ $? -eq 0 ]; then
-	arrDate=( $(cat ${filename} | grep Updated | sed 's/.*\([0-9]\{2\}\).*\([A-Za-z]\{3\}\).*\([0-9]\{4\}\).*/\3 \2 \1/g') )
-	filedate=${arrDate[0]}$(month ${arrDate[1]})${arrDate[2]}
-	sed -e "s/pkgver=.*/pkgver=${filedate}/g" \
+	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-main
-	git commit -sm "opera-adblock-main :: ${filedate}"
+	git commit -sm "opera-adblock-main :: ${date}"
 fi
 )
 
@@ -73,16 +31,14 @@ cd ${mainfolder}/opera-adblock-stat
 filename='urlfilter-stat.ini'
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/complete/urlfilter.ini
 if [ $? -eq 0 ]; then
-	arrDate=( $(cat ${filename} | grep Updated | sed 's/.*\([0-9]\{2\}\).*\([A-Za-z]\{3\}\).*\([0-9]\{4\}\).*/\3 \2 \1/g') )
-	filedate=${arrDate[0]}$(month ${arrDate[1]})${arrDate[2]}
-	sed -e "s/pkgver=.*/pkgver=${filedate}/g" \
+	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-stat
-	git commit -sm "opera-adblock-stat :: ${filedate}"
+	git commit -sm "opera-adblock-stat :: ${date}"
 fi
 )
 
@@ -92,16 +48,14 @@ cd ${mainfolder}/opera-adblock-elements
 filename='fanboy-adblocklist-elements-v4.css'
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/fanboy-adblocklist-elements-v4.css
 if [ $? -eq 0 ]; then
-	arrDate=( $(cat ${filename} | grep Updated | sed 's/.*\([0-9]\{2\}\).*\([A-Za-z]\{3\}\).*\([0-9]\{4\}\).*/\3 \2 \1/g') )
-	filedate=${arrDate[0]}$(month ${arrDate[1]})${arrDate[2]}
-	sed -e "s/pkgver=.*/pkgver=${filedate}/g" \
+	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-elements
-	git commit -sm "opera-adblock-elements :: ${filedate}"
+	git commit -sm "opera-adblock-elements :: ${date}"
 fi
 )
 

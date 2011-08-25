@@ -12,3 +12,5 @@ git add herecura-testing
 git commit -sm "testing :: autoupdated $(date +%Y%m%d)"
 
 git push origin master
+
+syncrepo

@@ -77,7 +77,7 @@ checksumdefined ()
 {
 	if [ -z "${2}" ]; then
 		echo "Could not work out the md5sum for the ${1}-bit build"
-		cleanup
+		rm -f md5sums
 		exit 1
 	fi
 }

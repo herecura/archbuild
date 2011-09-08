@@ -1,0 +1,4 @@
+#!/bin/bash
+source $(dirname $0)/config
+
+buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone ${1}"

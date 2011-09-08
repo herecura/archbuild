@@ -64,5 +64,3 @@ git push origin master
 (cd herecura-stable-any/opera-adblock-main; buildone)
 (cd herecura-stable-any/opera-adblock-stat; buildone)
 (cd herecura-stable-any/opera-adblock-elements; buildone)
-
-syncrepo

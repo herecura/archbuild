@@ -7,6 +7,10 @@ git pull origin master
 mainfolder="${rpdir}/herecura-stable-any"
 date=$(date +%Y%m%d)
 
+BUILD_ADBLOCK_MAIN=0
+BUILD_ADBLOCK_STAT=0
+BUILD_ADBLOCK_CSS=0
+
 # adblock main
 (
 cd ${mainfolder}/opera-adblock-main
@@ -22,6 +26,7 @@ if [ $? -eq 0 ]; then
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-main
 	git commit -sm "opera-adblock-main :: ${date}"
+	BUILD_ADBLOCK_MAIN=1
 fi
 )
 
@@ -39,6 +44,7 @@ if [ $? -eq 0 ]; then
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-stat
 	git commit -sm "opera-adblock-stat :: ${date}"
+	BUILD_ADBLOCK_STAT=1
 fi
 )
 
@@ -56,11 +62,18 @@ if [ $? -eq 0 ]; then
 	cd ${rpdir}
 	git add herecura-stable-any/opera-adblock-elements
 	git commit -sm "opera-adblock-elements :: ${date}"
+	BUILD_ADBLOCK_CSS=1
 fi
 )
 
 git push origin master
 
-(cd herecura-stable-any/opera-adblock-main; buildone)
-(cd herecura-stable-any/opera-adblock-stat; buildone)
-(cd herecura-stable-any/opera-adblock-elements; buildone)
+if [ $BUILD_ADBLOCK_MAIN -ne 0 ]; then
+	buildone herecura-stable-any/opera-adblock-main/
+fi
+if [ $BUILD_ADBLOCK_STAT -ne 0 ]; then
+	buildone herecura-stable-any/opera-adblock-stat/
+fi
+if [ $BUILD_ADBLOCK_CSS -ne 0 ]; then
+	buildone herecura-stable-any/opera-adblock-elements/
+fi

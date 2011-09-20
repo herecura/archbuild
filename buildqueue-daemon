@@ -20,7 +20,9 @@ then
 	done
 fi
 
-inotifywait -m --format '%f' -e close_write ${queuedir} | while read file
+inotifywait -q -m --format '%f' ${queuedir} -e create -e move -e modify | while read file
 do
-	runQueueItem ${file}
+	if [ -e ${queuedir}/${file} ]; then
+		runQueueItem ${file}
+	fi
 done

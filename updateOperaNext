@@ -70,6 +70,12 @@ oprandom=$(echo ${opranver} | sed -r "s,^([a-zA-Z0-9]+)_.*,\1,")
 
 # Echo back the latest snapshot
 echo The latest snapshot appears to be: ${opvernr}-${opbldnr}
+currVernr=$(grep -e '^_bigrelease' PKGBUILD | sed 's/_bigrelease=//')
+currBldnr=$(grep -e '^_buildver' PKGBUILD | sed 's/_buildver=//')
+if [ "${opvernr}-${opbldnr}" = "${currVernr}-${currBldnr}" ]; then
+	echo "Version was already created"
+	exit
+fi
 
 # Gather information from the md5sum file and again verify that it was
 # collected successfully.
@@ -193,4 +199,4 @@ git commit -sm "opera-next :: ${opvernr} ${opbldnr}"
 
 git push origin master
 
-(cd herecura-testing/opera-next; buildone)
+buildone herecura-testing/opera-next

@@ -69,12 +69,14 @@ opbldnr=$(echo ${opranver} | sed -r "s,.*_[0-9][0-9]\.[0-9][0-9]-([0-9]+)$,\1,")
 oprandom=$(echo ${opranver} | sed -r "s,^([a-zA-Z0-9]+)_.*,\1,")
 
 # Echo back the latest snapshot
-echo The latest snapshot appears to be: ${opvernr}-${opbldnr}
+#echo The latest snapshot appears to be: ${opvernr}-${opbldnr}
 currVernr=$(grep -e '^_bigrelease' PKGBUILD | sed 's/_bigrelease=//')
 currBldnr=$(grep -e '^_buildver' PKGBUILD | sed 's/_buildver=//')
 if [ "${opvernr}-${opbldnr}" = "${currVernr}-${currBldnr}" ]; then
-	echo "Version was already created"
+	echo "opera-next :: is already on the latest version"
 	exit
+else
+	echo "opera-next :: update PKGBUILD to ${opvernr}-${opbldnr}"
 fi
 
 # Gather information from the md5sum file and again verify that it was

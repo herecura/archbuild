@@ -2,13 +2,18 @@
 source $(dirname $0)/buildqueue.conf
 
 function runQueueItem {
+	currentQueue=$(date +%Y%m%d\ %H%M%S)
 	(
 		echo " "
 		echo "------------------------------------------------------------"
-		echo "running queueitem $(date +%Y%m%d\ %H%M%S)"
+		echo "running queueitem ${currentQueue}"
 		echo "------------------------------------------------------------"
 		source ${queuedir}/${1}
 		rm -f ${queuedir}/${1}
+		echo "------------------------------------------------------------"
+		echo "done queueitem ${currentQueue}"
+		echo "------------------------------------------------------------"
+		echo " "
 	) >> ~/log/buildqueue.log 2>&1
 }
 

@@ -27,6 +27,7 @@ else
 	rm -rf src 
 	git add .
 	git commit -sm "colibri :: ${nwVersion}"
+	git push origin master
 	buildone
 fi
 )

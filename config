@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=$PATH:$(dirname $0)
+PATH=$PATH:$(cd $(dirname $BASH_SOURCE) && pwd)
 
 # path
 rpdir=~/herecura

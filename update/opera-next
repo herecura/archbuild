@@ -116,6 +116,7 @@ pkgrel=1
 pkgdesc="A fast and secure web browser and Internet suite. Alpha version."
 url="http://my.opera.com/desktopteam/blog/"
 depends=('gcc-libs' 'libxt' 'freetype2' 'libxext')
+provides=('opera')
 replaces=('opera-devel')
 optdepends=('gtk2: GTK integration'
 	    'kdebase-runtime: KDE4+ integration'

@@ -30,9 +30,11 @@ else
 	mv PKGBUILD-updated PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src 
-	#git add .
-	#git commit -sm "${appname} :: ${nwVersion}"
-	#git push origin master
-	#buildone
+	buildone
+	if [ $? -eq 0 ]; then
+		git add .
+		git commit -sm "${appname} :: ${nwVersion}"
+		git push origin master
+	fi
 fi
 )

@@ -3,10 +3,13 @@ source $(dirname $0)/../config
 
 buildqueue-add \
 	"~/archbuild/update/colibri" \
+	"~/archbuild/update/httrack" \
 	"~/archbuild/update/kcm-grub2" \
 	"~/archbuild/update/kcm-qt-graphicssystem" \
 	"~/archbuild/update/kcm-wacomtablet" \
 	"~/archbuild/update/kmtail" \
+	"~/archbuild/update/kpartsplugin" \
 	"~/archbuild/update/kpassgen" \
 	"~/archbuild/update/kps" \
-	"~/archbuild/update/kwooty"
+	"~/archbuild/update/kwooty" \
+	"~/archbuild/update/lcdproc"

@@ -1,0 +1,5 @@
+#!/bin/bash
+appname=kcm-qt-graphicssystem
+content=129817
+searchfor='KCM\ Qt\ Graphics\ System'
+$(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

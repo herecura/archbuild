@@ -1,0 +1,5 @@
+#!/bin/bash
+appname=kcm-wacomtablet
+content=114856
+searchfor='wacom\ tablet'
+$(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

@@ -1,5 +1,5 @@
 #!/bin/bash
-appname=colibri
-content=117147
-searchfor='colibri'
+appname=kwooty
+content=114385
+searchfor='Kwooty'
 $(dirname $0)/from-kde-apps ${appname} ${content} ${searchfor}

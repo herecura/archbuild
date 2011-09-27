@@ -33,6 +33,10 @@ else
 		git add .
 		git commit -sm "${appname} :: ${nwVersion}"
 		git push origin master
+		cd ..
+		tar -zcf ${appname}.tar.gz ${appname}
+		aurup ${appname}.tar.gz system
+		rm ${appname}.tar.gz
 	fi
 fi
 )

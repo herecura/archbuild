@@ -14,4 +14,5 @@ buildqueue-add "~/archbuild/update/colibri" \
 	"~/archbuild/update/kwooty" \
 	"~/archbuild/update/lcdproc" \
 	"~/archbuild/update/lirc-bede" \
-	"~/archbuild/update/mkclean"
+	"~/archbuild/update/mkclean" \
+	"~/archbuild/update/mkvtoolnix-be"

@@ -33,6 +33,8 @@ else
 		git add .
 		git commit -sm "${appname} :: ${nwVersion}"
 		git push origin master
+	else
+		git checkout PKGBUILD
 	fi
 fi
 )

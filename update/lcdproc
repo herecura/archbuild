@@ -37,6 +37,8 @@ else
 		tar -zcf ${appname}.tar.gz ${appname}
 		aurup ${appname}.tar.gz system
 		rm ${appname}.tar.gz
+	else
+		git checkout PKGBUILD
 	fi
 fi
 )

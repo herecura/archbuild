@@ -12,4 +12,5 @@ buildqueue-add "~/archbuild/update/colibri" \
 	"~/archbuild/update/kpassgen" \
 	"~/archbuild/update/kps" \
 	"~/archbuild/update/kwooty" \
-	"~/archbuild/update/lcdproc"
+	"~/archbuild/update/lcdproc" \
+	"~/archbuild/update/lirc-bede"

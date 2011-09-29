@@ -13,7 +13,7 @@ cd herecura-stable-any/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://code.google.com/p/closure-linter/downloads/list | grep -m1 -ie "<a.*closure_linter-[0-9\.]*\.tar\.gz.*Download" | sed 's,.*closure_linter-\([0-9\.]*\)\.tar\.gz.*,\1,')
+nwVersion=$(wget -q -O- http://code.google.com/p/closure-linter/downloads/list | grep -m1 -ie "<a.*closure_linter-[0-9\.]*.\.tar\.gz.*Download" | sed 's,.*closure_linter-\([0-9a-z\.]*\)\.tar\.gz.*,\1,')
 
 if [ "${nwVersion}" = "${pkgver}" ]; then
 	echo "${appname} :: is already on the latest version"

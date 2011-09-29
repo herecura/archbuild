@@ -21,4 +21,5 @@ buildqueue-add \
 	"~/archbuild/update/mkvtoolnix-be" \
 	"~/archbuild/update/nmapsi4" \
 	"~/archbuild/update/nntpgrab" \
+	"~/archbuild/update/opera" \
 	"~/archbuild/update/python2-gflags"

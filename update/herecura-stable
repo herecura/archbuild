@@ -19,4 +19,5 @@ buildqueue-add \
 	"~/archbuild/update/lirc-bede" \
 	"~/archbuild/update/mkclean" \
 	"~/archbuild/update/mkvtoolnix-be" \
+	"~/archbuild/update/nmapsi4" \
 	"~/archbuild/update/python2-gflags"

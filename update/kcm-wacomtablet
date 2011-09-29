@@ -1,5 +1,12 @@
 #!/bin/bash
+source $(dirname $0)/../config
+
 appname=kcm-wacomtablet
 content=114856
 searchfor='wacom\ tablet'
 $(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"
+
+cd ${rpdir}/herecura-stable
+tar -zcf ${appname}.tar.gz ${appname}
+aurup ${appname}.tar.gz kde
+rm ${appname}.tar.gz

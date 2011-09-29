@@ -36,7 +36,7 @@ else
 		# i maintain this so upload on success to aur
 		cd ..
 		tar -zcf ${appname}.tar.gz ${appname}
-		aurup ${appname}.tar.gz devel
+		aurup ${appname}.tar.gz network
 		rm -f ${appname}.tar.gz
 	else
 		git checkout PKGBUILD

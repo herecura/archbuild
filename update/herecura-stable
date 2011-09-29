@@ -18,4 +18,5 @@ buildqueue-add \
 	"~/archbuild/update/lcdproc" \
 	"~/archbuild/update/lirc-bede" \
 	"~/archbuild/update/mkclean" \
-	"~/archbuild/update/mkvtoolnix-be"
+	"~/archbuild/update/mkvtoolnix-be" \
+	"~/archbuild/update/python2-gflags"

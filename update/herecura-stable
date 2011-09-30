@@ -30,5 +30,6 @@ buildqueue-add \
 	"~/archbuild/update/python2-gflags" \
 	"~/archbuild/update/python2-pymongo" \
 	"~/archbuild/update/python2-yenc" \
+	"~/archbuild/update/sabnzbd" \
 	"~/archbuild/update/xmlindent" \
 	"~/archbuild/update/xmlstarlet"

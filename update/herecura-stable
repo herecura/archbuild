@@ -25,6 +25,7 @@ buildqueue-add \
 	"~/archbuild/update/nmapsi4" \
 	"~/archbuild/update/nntpgrab" \
 	"~/archbuild/update/opera" \
+	"~/archbuild/update/pdfminer" \
 	"~/archbuild/update/php-mongo" \
 	"~/archbuild/update/python2-gflags" \
 	"~/archbuild/update/python2-pymongo" \

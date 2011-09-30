@@ -122,14 +122,22 @@ fi
 return 0
 }
 
-mkres=1
+mkres=0
 source PKGBUILD
 echo "run makepkg for ${thisfolder##*/}"
 for _arch in ${arch[@]}; do
   echo ${_arch}
   buildInChroot ${_arch}
-  [ $? -eq 0 ] && mkres=0
+  [ $? -ne 0 ] && mkres=1
 done
+
+# if i maintain it in aur upload
+if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
+		# i maintain this so upload on success to aur
+    makepkg --source
+    aurup $(ls -1 *.src.tar.gz) $(cat AUR)
+    rm -rf *.src.tar.gz src/
+fi
 exit ${mkres}
 
 # vim:set ts=2 sw=2 et:

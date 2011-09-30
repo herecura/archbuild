@@ -33,11 +33,6 @@ else
 		git add .
 		git commit -sm "${appname} :: ${nwVersion}"
 		git push origin master
-		# i maintain this so upload on success to aur
-		cd ..
-		tar -zcf ${appname}.tar.gz ${appname}
-		aurup ${appname}.tar.gz x11
-		rm ${appname}.tar.gz
 	else
 		git checkout PKGBUILD
 	fi

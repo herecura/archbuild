@@ -6,6 +6,7 @@ buildqueue-add \
 	"~/archbuild/update/closure-compiler" \
 	"~/archbuild/update/closure-linter" \
 	"~/archbuild/update/colibri" \
+	"~/archbuild/update/flacon" \
 	"~/archbuild/update/httrack" \
 	"~/archbuild/update/jalbum" \
 	"~/archbuild/update/kcm-grub2" \

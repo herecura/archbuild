@@ -24,4 +24,5 @@ buildqueue-add \
 	"~/archbuild/update/opera" \
 	"~/archbuild/update/php-mongo" \
 	"~/archbuild/update/python2-gflags" \
-	"~/archbuild/update/python2-pymongo"
+	"~/archbuild/update/python2-pymongo" \
+	"~/archbuild/update/python2-yenc"

@@ -110,7 +110,7 @@ else
     rm -f *.pkg.* # remove symlinks
     rm -f *.log{,.*}
     pushd ${packagesdir}/${_arch}
-    find -name "${thisfolder##*/}*" -mmin +80 -delete
+    find -name "${thisfolder##*/}*" -mmin +30 -delete
     repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
     popd
   else

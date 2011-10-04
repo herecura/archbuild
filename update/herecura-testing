@@ -1,10 +1,39 @@
 #!/bin/bash
 source $(dirname $0)/../config
 
-buildqueue-add "cd ${rpdir}" \
-	"buildbot herecura-testing-any" \
-	"buildbot herecura-testing" \
-	"git add herecura-testing-any" \
-	"git add herecura-testing" \
-	"git commit -sm \"testing :: autoupdated $(date +%Y%m%d)\"" \
-	"git push origin master"
+
+folders=$(ls -1 ${rpdir}/herecura-testing-any)
+for folder in ${folders}
+do
+	if [ -d ${rpdir}/herecura-testing-any/${folder} ];
+	then
+		buildone herecura-testing-any/${folder}
+		if [ $? -eq 0 ]; then
+			source PKGBUILD
+			git add .
+			git commit -sm "${pkgname} :: ${pkgver}"
+		else
+			git checkout PKGBUILD
+		fi
+	fi
+done
+
+folders=$(ls -1 ${rpdir}/herecura-testing)
+for folder in ${folders}
+do
+	if [ -d ${rpdir}/herecura-testing/${folder} ];
+	then
+		buildone herecura-testing/${folder}
+		if [ $? -eq 0 ]; then
+			source PKGBUILD
+			git add .
+			git commit -sm "${pkgname} :: ${pkgver}"
+		else
+			git checkout PKGBUILD
+		fi
+	fi
+done
+
+cd ${rpdir}
+git push origin master
+

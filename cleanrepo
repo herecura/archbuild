@@ -1,11 +1,6 @@
 #!/bin/bash
 source $(dirname $0)/config
 
-if test -e /tmp/buildbot; then
-	echo "buildbot is running, quitting"
-  exit
-fi
-
 source repository
 
 returndir=`pwd`

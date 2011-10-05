@@ -1,6 +1,7 @@
 #!/bin/bash
 source $(dirname $0)/../config
 
+cd ${rpdir}
 
 folders=$(ls -1 ${rpdir}/herecura-testing-any)
 for folder in ${folders}
@@ -9,11 +10,11 @@ do
 	then
 		buildone herecura-testing-any/${folder}
 		if [ $? -eq 0 ]; then
-			source PKGBUILD
-			git add .
+			source ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
+			git add ${rpdir}/herecura-testing-any/${folder}
 			git commit -sm "${pkgname} :: ${pkgver}"
 		else
-			git checkout PKGBUILD
+			git checkout ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
 		fi
 	fi
 done
@@ -25,11 +26,11 @@ do
 	then
 		buildone herecura-testing/${folder}
 		if [ $? -eq 0 ]; then
-			source PKGBUILD
-			git add .
+			source ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
+			git add ${rpdir}/herecura-testing-any/${folder}
 			git commit -sm "${pkgname} :: ${pkgver}"
 		else
-			git checkout PKGBUILD
+			git checkout ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
 		fi
 	fi
 done

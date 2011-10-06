@@ -17,17 +17,21 @@ function runQueueItem {
 	) >> ~/log/buildqueue.log 2>&1
 }
 
-if [ $(ls -1 ${queuedir} | wc -l) -gt 0 ]
-then
-	for file in $(ls -1 ${queuedir})
-	do
-		runQueueItem ${file}
-	done
-fi
-
-inotifywait -q -m --format '%f' ${queuedir} -e create -e move -e modify | while read file
-do
-	if [ -e ${queuedir}/${file} ]; then
-		runQueueItem ${file}
+function buildQueue {
+	if [ $(ls -1 ${queuedir} | wc -l) -gt 0 ]
+	then
+		for file in $(ls -1 ${queuedir})
+		do
+			runQueueItem ${file}
+		done
 	fi
-done
+
+	inotifywait -q -m --format '%f' ${queuedir} -e create -e move -e modify | while read file
+	do
+		if [ -e ${queuedir}/${file} ]; then
+			runQueueItem ${file}
+		fi
+	done
+}
+
+buildQueue &

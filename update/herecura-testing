@@ -3,36 +3,23 @@ source $(dirname $0)/../config
 
 cd ${rpdir}
 
-folders=$(ls -1 ${rpdir}/herecura-testing-any)
-for folder in ${folders}
+for rpfolder in 'herecura-testing-any' 'herecura-testing'
 do
-	if [ -d ${rpdir}/herecura-testing-any/${folder} ];
-	then
-		buildone herecura-testing-any/${folder}
-		if [ $? -eq 0 ]; then
-			source ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
-			git add ${rpdir}/herecura-testing-any/${folder}
-			git commit -sm "${pkgname} :: ${pkgver}"
-		else
-			git checkout ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
+	folders=$(ls -1 ${rpdir}/${rpfolder})
+	for folder in ${folders}
+	do
+		if [ -d ${rpdir}/${rpfolder}/${folder} ];
+		then
+			buildone ${rpfolder}/${folder}
+			if [ $? -eq 0 ]; then
+				source ${rpdir}/${rpfolder}/${folder}/PKGBUILD
+				git add ${rpdir}/${rpfolder}/${folder}
+				git commit -sm "${pkgname} :: ${pkgver}"
+			else
+				git checkout ${rpdir}/${rpfolder}/${folder}/PKGBUILD
+			fi
 		fi
-	fi
-done
-
-folders=$(ls -1 ${rpdir}/herecura-testing)
-for folder in ${folders}
-do
-	if [ -d ${rpdir}/herecura-testing/${folder} ];
-	then
-		buildone herecura-testing/${folder}
-		if [ $? -eq 0 ]; then
-			source ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
-			git add ${rpdir}/herecura-testing-any/${folder}
-			git commit -sm "${pkgname} :: ${pkgver}"
-		else
-			git checkout ${rpdir}/herecura-testing-any/${folder}/PKGBUILD
-		fi
-	fi
+	done
 done
 
 cd ${rpdir}

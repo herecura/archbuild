@@ -9,18 +9,23 @@ date=$(date +%Y%m%d)
 
 # adblock main
 (
+echo "opera-adblock-main"
 cd ${mainfolder}/opera-adblock-main
 filename='urlfilter-main.ini'
 rm -f ${filename}
+echo "downloading ..."
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/urlfilter.ini
 if [ $? -eq 0 ]; then
+	echo "update pkgbuild ..."
 	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
+	echo "build ..."
 	buildone
 	cd ${rpdir}
+	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-main
 	git commit -sm "opera-adblock-main :: ${date}"
 fi
@@ -28,17 +33,22 @@ fi
 
 # adblock stat
 (
+echo "opera-adblock-stat"
 cd ${mainfolder}/opera-adblock-stat
 filename='urlfilter-stat.ini'
+echo "downloading ..."
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/complete/urlfilter.ini
 if [ $? -eq 0 ]; then
+	echo "update pkgbuild ..."
 	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
+	echo "build ..."
 	buildone
 	cd ${rpdir}
+	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-stat
 	git commit -sm "opera-adblock-stat :: ${date}"
 fi
@@ -46,17 +56,22 @@ fi
 
 # v4 elements css
 (
+echo "opera-adblock-elements"
 cd ${mainfolder}/opera-adblock-elements
 filename='fanboy-adblocklist-elements-v4.css'
+echo "downloading ..."
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/fanboy-adblocklist-elements-v4.css
 if [ $? -eq 0 ]; then
+	echo "update pkgbuild ..."
 	sed -e "s/pkgver=.*/pkgver=${date}/g" \
 		-e "/.*sums.*/d" \
 		-i PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
+	echo "build ..."
 	buildone
 	cd ${rpdir}
+	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-elements
 	git commit -sm "opera-adblock-elements :: ${date}"
 fi

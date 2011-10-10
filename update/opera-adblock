@@ -28,6 +28,8 @@ if [ $? -eq 0 ]; then
 	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-main
 	git commit -sm "opera-adblock-main :: ${date}"
+else
+	git checkout ${filename}
 fi
 )
 
@@ -51,6 +53,8 @@ if [ $? -eq 0 ]; then
 	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-stat
 	git commit -sm "opera-adblock-stat :: ${date}"
+else
+	git checkout ${filename}
 fi
 )
 
@@ -74,6 +78,8 @@ if [ $? -eq 0 ]; then
 	echo "commit ..."
 	git add herecura-stable-any/opera-adblock-elements
 	git commit -sm "opera-adblock-elements :: ${date}"
+else
+	git checkout ${filename}
 fi
 )
 

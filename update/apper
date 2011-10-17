@@ -1,0 +1,5 @@
+#!/bin/bash
+appname=apper
+content=84745
+searchfor='Apper'
+$(dirname $0)/from-kde-apps ${appname} ${content} ${searchfor}

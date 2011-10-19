@@ -2,6 +2,7 @@
 source $(dirname $0)/../config
 
 buildqueue-add \
+	"~/archbuild/update/apper" \
 	"~/archbuild/update/atunes" \
 	"~/archbuild/update/closure-compiler" \
 	"~/archbuild/update/closure-linter" \

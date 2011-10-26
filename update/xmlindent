@@ -13,7 +13,7 @@ cd herecura-stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlindent/ | grep -ie "<a\ href=.*\/xmlindent.*tar\.gz"  | sed 's,.*<a href=".*xmlindent-\(.*\)\.tar\.gz.*".*title.*,\1,')
+nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlindent/ | grep -ie "<a\ href=.*\/xmlindent.*tar\.gz"  | sed 's,.*<a href=".*title=.*xmlindent-\(.*\)\.tar\.gz.*,\1,')
 
 if [ "${nwVersion}" = "${pkgver}" ]; then
 	echo "${appname} :: is already on the latest version"

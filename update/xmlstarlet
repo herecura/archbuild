@@ -13,7 +13,7 @@ cd herecura-stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlstar/ | grep -ie "<a\ href=.*\/xmlstarlet.*tar\.gz"  | sed 's,.*<a href=".*xmlstarlet-\(.*\)\.tar\.gz.*".*title.*,\1,')
+nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlstar/ | grep -ie "<a\ href=.*\/xmlstarlet.*tar\.gz"  | sed 's,.*<a href=".*title=.*xmlstarlet-\(.*\)\.tar\.gz.*,\1,')
 
 if [ "${nwVersion}" = "${pkgver}" ]; then
 	echo "${appname} :: is already on the latest version"

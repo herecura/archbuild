@@ -3,7 +3,7 @@ source $(dirname $0)/../config
 
 cd ${rpdir}
 
-cd herecura-testing/opera-next
+cd testing/opera-next
 
 # 
 # This script page scrapes the Opera Desktop Team Blog to check for the
@@ -195,9 +195,9 @@ post_remove() {
 EOS
 
 cd ${rpdir}
-git add herecura-testing/opera-next
+git add testing/opera-next
 git commit -sm "opera-next :: ${opvernr} ${opbldnr}"
 
 git push origin master
 
-buildone herecura-testing/opera-next
+buildone testing/opera-next

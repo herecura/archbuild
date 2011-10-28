@@ -10,7 +10,7 @@ searchfor="$3"
 
 (
 # cd to folder of ${appname}
-cd herecura-stable/${appname}
+cd stable/${appname}
 
 source PKGBUILD
 

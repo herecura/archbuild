@@ -3,7 +3,7 @@ source $(dirname $0)/../config
 
 cd ${rpdir}
 
-for rpfolder in 'herecura-testing-any' 'herecura-testing'
+for rpfolder in 'testing-any' 'testing'
 do
 	folders=$(ls -1 ${rpdir}/${rpfolder})
 	for folder in ${folders}

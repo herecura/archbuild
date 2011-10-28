@@ -4,7 +4,7 @@ source $(dirname $0)/../config
 cd ${rpdir}
 git pull origin master
 
-mainfolder="${rpdir}/herecura-stable-any"
+mainfolder="${rpdir}/stable-any"
 date=$(date +%Y%m%d)
 
 # adblock main
@@ -26,7 +26,7 @@ if [ $? -eq 0 ]; then
 	buildone
 	cd ${rpdir}
 	echo "commit ..."
-	git add herecura-stable-any/opera-adblock-main
+	git add stable-any/opera-adblock-main
 	git commit -sm "opera-adblock-main :: ${date}"
 else
 	git checkout ${filename}
@@ -54,7 +54,7 @@ if [ $? -eq 0 ]; then
 	buildone
 	cd ${rpdir}
 	echo "commit ..."
-	git add herecura-stable-any/opera-adblock-stat
+	git add stable-any/opera-adblock-stat
 	git commit -sm "opera-adblock-stat :: ${date}"
 else
 	git checkout ${filename}
@@ -79,7 +79,7 @@ if [ $? -eq 0 ]; then
 	buildone
 	cd ${rpdir}
 	echo "commit ..."
-	git add herecura-stable-any/opera-adblock-elements
+	git add stable-any/opera-adblock-elements
 	git commit -sm "opera-adblock-elements :: ${date}"
 else
 	git checkout ${filename}

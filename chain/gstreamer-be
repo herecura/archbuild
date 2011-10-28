@@ -1,8 +1,8 @@
 #!/bin/bash
 source $(dirname $0)/../config
 
-# goto herecura-stable
-cd ${rpdir}/herecura-stable || exit
+# goto stable
+cd ${rpdir}/stable || exit
 
 # make the packages in the correct sequence
 (cd gstreamer0.10-be; buildone);

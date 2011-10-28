@@ -42,9 +42,12 @@ echo "downloading ..."
 wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/complete/urlfilter.ini
 if [ $? -eq 0 ]; then
 	echo "update pkgbuild ..."
-	sed -e "s/pkgver=.*/pkgver=${date}/g" \
-		-e "/.*sums.*/d" \
-		-i PKGBUILD
+	cat PKGBUILD |\
+	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
+		-e "s/^pkgrel=.*/pkgrel=1/g" |\
+	awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
+	> PKGBUILD-updated
+	mv PKGBUILD-updated PKGBUILD
 	makepkg -g >> PKGBUILD
 	rm -rf src
 	echo "build ..."

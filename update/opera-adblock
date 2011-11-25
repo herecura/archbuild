@@ -43,7 +43,7 @@ wget -q -O ${filename} http://www.fanboy.co.nz/adblock/opera/complete/urlfilter.
 if [ $? -eq 0 ]; then
 	echo "update pkgbuild ..."
 	cat PKGBUILD |\
-	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
+	sed -e "s/^pkgver=.*/pkgver=${date}/g"  \
 		-e "s/^pkgrel=.*/pkgrel=1/g" |\
 	awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
 	> PKGBUILD-updated

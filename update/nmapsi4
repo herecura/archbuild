@@ -13,7 +13,7 @@ cd stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://code.google.com/p/nmapsi4/downloads/list | grep -m1 -ie "<a.*nmapsi4-[0-9\.]*\.tar\.gz.*Download" | sed 's,.*nmapsi4-\([0-9\.]*\)\.tar\.gz.*,\1,')
+nwVersion=$(wget -q -O- http://code.google.com/p/nmapsi4/downloads/list | grep -m1 -ie "<a.*nmapsi4-[0-9\.]*\.tar\.bz2.*Download" | sed 's,.*nmapsi4-\([0-9\.]*\)\.tar\.bz2.*,\1,')
 
 if [ "${nwVersion}" = "${pkgver}" ]; then
 	echo "${appname} :: is already on the latest version"

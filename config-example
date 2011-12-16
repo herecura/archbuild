@@ -16,5 +16,4 @@ arch64=/path/to/64bit/chroot
 SyncRepo=/path/to/syncscript
 
 # mailto
-mailsubject='archbuild of PKGNAME'
 mailto='nobody@example.com'

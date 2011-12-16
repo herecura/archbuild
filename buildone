@@ -72,16 +72,16 @@ if [ "$install_what" != "" ]; then
 fi
 if [ "$1" == "any" ]; then
   _arch=$1
-  buildx="build64 -c${install_before}"
+  buildx="build64 -l archbuild -c${install_before}"
 elif [ "$1" == "x86_64" ]; then
   _arch=$1
-  buildx="build64 -c${install_before}"
+  buildx="build64 -l archbuild -c${install_before}"
 elif [ "$1" == "i686" ]; then
   _arch=$1
-  buildx="build32 -c${install_before}"
+  buildx="build32 -l archbuild -c${install_before}"
 else
   _arch='any'
-  buildx="build64 -c${install_before}"
+  buildx="build64 -l archbuild -c${install_before}"
 fi
 if [ ${keepsource} -eq 1 ]; then
   buildx="${buildx} -- --log"

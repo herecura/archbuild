@@ -1,0 +1,20 @@
+#!/bin/bash
+PATH=$PATH:$(cd $(dirname $BASH_SOURCE) && pwd)
+
+# path
+rpdir=/path/to/pkgbuilds
+dest=/path/to/repository
+
+# sources path
+sourcesdir=/path/to/sources
+
+# chroot paths
+arch32=/path/to/32bit/chroot
+arch64=/path/to/64bit/chroot
+
+# SyncRepo
+SyncRepo=/path/to/syncscript
+
+# mailto
+mailsubject='archbuild of PKGNAME'
+mailto='nobody@example.com'

@@ -106,7 +106,7 @@ else
   fi
   PKGDEST=${packagesdir}/${_arch} ${buildx}
   if [ $? -eq 0 ]; then
-    echo "package ${thisfolder##*/}-${pkgver} .pkg successfully built"
+    echo "package ${thisfolder##*/}-${pkgver}-${_arch}.pkg successfully built"
     rm -f *.pkg.* # remove symlinks
     rm -f *.log{,.*}
     pushd ${packagesdir}/${_arch}
@@ -114,7 +114,7 @@ else
     repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
     popd
   else
-    echo "package ${thisfolder##*/}-${pkgver} .pkg failed"
+    echo "package ${thisfolder##*/}-${pkgver}-${_arch}.pkg failed"
     return 2
   fi
   return 0
@@ -128,7 +128,10 @@ echo "run makepkg for ${thisfolder##*/}"
 for _arch in ${arch[@]}; do
   echo ${_arch}
   buildInChroot ${_arch}
-  [ $? -ne 0 ] && mkres=1
+  result=$?
+  if [[ $mkres -eq 0 && $result -ne 0 ]]; then
+    mkres=$result
+  fi
 done
 
 # if i maintain it in aur upload
@@ -138,6 +141,32 @@ if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
     aurup $(ls -1 *.src.tar.gz) $(cat AUR)
     rm -rf *.src.tar.gz src/
 fi
-exit ${mkres}
 
+if [ "${mailto}" != "" ]; then
+  date=$(date +%Y-%m-%d\ %H:%M:%S)
+  if [ ${mkres} -eq 0 ]; then
+    # package success
+    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} success ${date}" ${mailto}
+  elif [ ${mkres} -eq 1 ]; then
+    # package exists
+    echo "no mail for exists"
+    # echo "EXISTS build" | mail -s "archbuild ${thisfolder##*/} exists ${date}" ${mailto}
+  elif [ ${mkres} -eq 2 ]; then
+    # package failed
+    logfiles=""
+    for logfile in *.log; do
+      logfiles="$logfiles -a $logfile"
+    done
+    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} failed ${date}"$logfiles ${mailto}
+  else
+    # other failure
+    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} failed ${date}" ${mailto}
+  fi
+fi
+
+# cleanup
+rm -f *.pkg.* # remove symlinks
+rm -f *.log{,.*}
+
+exit ${mkres}
 # vim:set ts=2 sw=2 et:

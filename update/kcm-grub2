@@ -1,5 +1,5 @@
 #!/bin/bash
 appname=kcm-grub2
 content=139643
-searchfor='GRUB2\ Bootloader\ Editor'
+searchfor='GRUB2\ Editor'
 $(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

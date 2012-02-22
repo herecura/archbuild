@@ -146,7 +146,7 @@ if [ "${mailto}" != "" ]; then
   date=$(date +%Y-%m-%d\ %H:%M:%S)
   if [ ${mkres} -eq 0 ]; then
     # package success
-    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} success ${date}" ${mailto}
+    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} success ${date}" ${mailto}
   elif [ ${mkres} -eq 1 ]; then
     # package exists
     echo "no mail for exists"
@@ -157,10 +157,10 @@ if [ "${mailto}" != "" ]; then
     for logfile in *.log; do
       logfiles="$logfiles -a $logfile"
     done
-    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} failed ${date}"$logfiles ${mailto}
+    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} failed ${date}"$logfiles ${mailto}
   else
     # other failure
-    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} failed ${date}" ${mailto}
+    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} failed ${date}" ${mailto}
   fi
 fi
 

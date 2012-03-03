@@ -1,0 +1,4 @@
+#!/bin/bash
+source $(dirname $0)/buildqueue.conf
+
+$EDITOR ~/log/buildqueue.log

@@ -2,7 +2,13 @@
 source $(dirname $0)/config
 
 if [ ! -z "$1" ]; then
-  cd "$1"
+  commitmsg="$1"
+else
+  commitmsg=""
+fi
+
+if [ ! -z "$2" ]; then
+  cd "$2"
 fi
 
 ## init
@@ -133,6 +139,17 @@ for _arch in ${arch[@]}; do
     mkres=$result
   fi
 done
+source PKGBUILD
+
+# on success build commit into git tree
+if [ ${mkres} -eq 0 ]; then
+  git add .
+  finalcommitmsg="${thisfolder##*/} :: ${pkgver}-${pkgrel}"
+  if [ "$commitmsg" != "" ]; then
+    finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
+  fi
+  git commit -sm "${finalcommitmsg}"
+fi
 
 # if i maintain it in aur upload
 if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
@@ -146,7 +163,7 @@ if [ "${mailto}" != "" ]; then
   date=$(date +%Y-%m-%d\ %H:%M:%S)
   if [ ${mkres} -eq 0 ]; then
     # package success
-    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} success ${date}" ${mailto}
+    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} success ${date}" ${mailto}
   elif [ ${mkres} -eq 1 ]; then
     # package exists
     echo "no mail for exists"
@@ -157,10 +174,10 @@ if [ "${mailto}" != "" ]; then
     for logfile in *.log; do
       logfiles="$logfiles -a $logfile"
     done
-    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} failed ${date}"$logfiles ${mailto}
+    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} failed ${date}"$logfiles ${mailto}
   else
     # other failure
-    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} ${pkgver} failed ${date}" ${mailto}
+    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} failed ${date}" ${mailto}
   fi
 fi
 

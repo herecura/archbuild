@@ -195,9 +195,5 @@ post_remove() {
 EOS
 
 cd ${rpdir}
-git add testing/opera-next
-git commit -sm "opera-next :: ${opvernr} ${opbldnr}"
 
-git push origin master
-
-buildone testing/opera-next
+buildone '' testing/opera-next

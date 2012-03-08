@@ -10,14 +10,7 @@ do
 	do
 		if [ -d ${rpdir}/${rpfolder}/${folder} ];
 		then
-			buildone ${rpfolder}/${folder}
-			if [ $? -eq 0 ]; then
-				source ${rpdir}/${rpfolder}/${folder}/PKGBUILD
-				git add ${rpdir}/${rpfolder}/${folder}
-				git commit -sm "${pkgname} :: ${pkgver}"
-			else
-				git checkout ${rpdir}/${rpfolder}/${folder}/PKGBUILD
-			fi
+			buildone '' ${rpfolder}/${folder}
 		fi
 	done
 done

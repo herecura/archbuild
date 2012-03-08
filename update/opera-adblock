@@ -24,10 +24,6 @@ if [ $? -eq 0 ]; then
 	rm -rf src
 	echo "build ..."
 	buildone
-	cd ${rpdir}
-	echo "commit ..."
-	git add stable-any/opera-adblock-main
-	git commit -sm "opera-adblock-main :: ${date}"
 else
 	git checkout ${filename}
 fi
@@ -52,10 +48,6 @@ if [ $? -eq 0 ]; then
 	rm -rf src
 	echo "build ..."
 	buildone
-	cd ${rpdir}
-	echo "commit ..."
-	git add stable-any/opera-adblock-stat
-	git commit -sm "opera-adblock-stat :: ${date}"
 else
 	git checkout ${filename}
 fi
@@ -77,10 +69,6 @@ if [ $? -eq 0 ]; then
 	rm -rf src
 	echo "build ..."
 	buildone
-	cd ${rpdir}
-	echo "commit ..."
-	git add stable-any/opera-adblock-elements
-	git commit -sm "opera-adblock-elements :: ${date}"
 else
 	git checkout ${filename}
 fi

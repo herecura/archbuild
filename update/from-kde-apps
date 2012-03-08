@@ -31,12 +31,5 @@ else
 	makepkg -g >> PKGBUILD
 	rm -rf src 
 	buildone
-	if [ $? -eq 0 ]; then
-		git add .
-		git commit -sm "${appname} :: ${nwVersion}"
-		git push origin master
-	else
-		git checkout PKGBUILD
-	fi
 fi
 )

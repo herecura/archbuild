@@ -31,7 +31,9 @@ buildqueue-add \
 	"~/archbuild/update/python2-yenc" \
 	"~/archbuild/update/sabnzbd" \
 	"~/archbuild/update/xmlindent" \
-	"~/archbuild/update/xmlstarlet"
+	"~/archbuild/update/xmlstarlet" \
+	"cd ${rpdir}" \
+	"git push origin master"
 
 
 	#"~/archbuild/update/opera" \

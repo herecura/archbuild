@@ -1,0 +1,291 @@
+#!/bin/bash
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+FORCE='n'
+RUN=''
+MAKEPKG_ARGS='-s --noconfirm'
+#COPY='copy'
+WORKDIR=$PWD
+
+update_first='0'
+clean_first='0'
+install_before=''
+install_pkg=''
+add_to_db=0
+
+chrootdir=''
+
+APPNAME=$(basename "${0}")
+
+default_copy=$USER
+[[ -n $SUDO_USER ]] && default_copy=$SUDO_USER
+[[ -z $default_copy || $default_copy = root ]] && default_copy=copy
+
+usage() {
+	echo "usage ${APPNAME} [options] -r <chrootdir> [--] [makepkg args]"
+	echo ' Run this script in a PKGBUILD dir to build a package inside a'
+	echo ' clean chroot. All unrecognized arguments passed to this script'
+	echo ' will be passed to makepkg.'
+	echo ''
+	echo ' The chroot dir consists of the following directories:'
+	echo ' <chrootdir>/{root, copy} but only "root" is required'
+	echo ' by default. The working copy will be created as needed'
+	echo ''
+	echo 'The chroot "root" directory must be created via the following'
+	echo 'command:'
+	echo '    mkarchroot <chrootdir>/root base base-devel sudo'
+	echo ''
+	echo "Default makepkg args: $MAKEPKG_ARGS"
+	echo ''
+	echo 'Flags:'
+	echo '-h         This help'
+	echo '-c         Clean the chroot before building'
+	echo '-u         Update the working copy of the chroot before building'
+	echo '           This is useful for rebuilds without dirtying the pristine'
+	echo '           chroot'
+	echo '-y         install these packages before running makepkg'
+	echo '-d         Add the package to a local db at /repo after building'
+	echo '-r <dir>   The chroot dir to use'
+	echo '-I <pkg>   Install a package into the working copy of the chroot'
+	echo '-l <copy>  The directory to use as the working copy of the chroot'
+	echo '           Useful for maintaining multiple copies.'
+	echo "           Default: $default_copy"
+	exit 1
+}
+
+unbind() {
+	for u in 'pkgdest' 'srcdest' 'build'; do
+		if df -ah | grep ${copydir}/${u}> /dev/null 2>&1; then
+			umount ${copydir}/${u}
+		fi
+	done
+}
+
+while getopts 'hcuy:dr:I:l:' arg; do
+	case "${arg}" in
+		h) usage ;;
+		c) clean_first=1 ;;
+		u) update_first=1 ;;
+		y) install_before="$OPTARG" ;;
+		d) add_to_db=1 ;;
+		r) chrootdir="$OPTARG" ;;
+		I) install_pkg="$OPTARG" ;;
+		l) copy="$OPTARG" ;;
+		*) MAKEPKG_ARGS="$MAKEPKG_ARGS -$arg $OPTARG" ;;
+	esac
+done
+
+# Canonicalize chrootdir, getting rid of trailing /
+chrootdir=$(readlink -e "$chrootdir")
+
+[[ -z $copy ]] && copy=$default_copy
+copydir="$chrootdir/$copy"
+
+# Pass all arguments after -- right to makepkg
+MAKEPKG_ARGS="$MAKEPKG_ARGS ${*:$OPTIND}"
+
+if [ "$EUID" != '0' ]; then
+	echo 'This script must be run as root.'
+	exit 1
+fi
+
+if [ ! -f PKGBUILD -a -z "$install_pkg" ]; then
+	echo 'This must be run in a directory containing a PKGBUILD.'
+	exit 1
+fi
+
+if [ ! -d "$chrootdir" ]; then
+	echo "No chroot dir defined, or invalid path '$chrootdir'"
+	exit 1
+fi
+
+if [ ! -d "$chrootdir/root" ]; then
+	echo 'Missing chroot dir root directory.'
+	echo "Try using: mkarchroot $chrootdir/root base base-devel sudo"
+	usage
+fi
+
+umask 0022
+
+# Lock the chroot we want to use. We'll keep this lock until we exit.
+# Note this is the same FD number as in mkarchroot
+exec 9>"$copydir.lock"
+if ! flock -n 9; then
+	echo -n "locking chroot copy '$copy'..."
+	flock 9
+	echo "done"
+fi
+
+if [ ! -d "$copydir" -o "$clean_first" -eq "1" ]; then
+	# Get a read lock on the root chroot to make
+	# sure we don't clone a half-updated chroot
+	exec 8>"$chrootdir/root.lock"
+
+	if ! flock -sn 8; then
+		echo -n "locking clean chroot..."
+		flock -s 8
+		echo "done"
+	fi
+
+	echo -n 'creating clean working copy...'
+	use_rsync=false
+	if type -P btrfs >/dev/null; then
+		[ -d $copydir ] && btrfs subvolume delete "$copydir" &>/dev/null
+		btrfs subvolume snapshot "$chrootdir/root" "$copydir" &>/dev/null || use_rsync=true
+	else
+		use_rsync=true
+	fi
+
+	if $use_rsync; then
+		mkdir -p "$copydir"
+		rsync -a --delete -q -W -x "$chrootdir/root/" "$copydir"
+	fi
+	echo 'done'
+
+	# Drop the read lock again
+	exec 8>&-
+fi
+
+if [ -n "$install_pkg" ]; then
+	pkgname="$(basename "$install_pkg")"
+	cp "$install_pkg" "$copydir/$pkgname"
+	mkarchroot -r "pacman -U /$pkgname" "$copydir"
+	ret=$?
+	rm "$copydir/$pkgname"
+	# Exit early, we've done all we need to
+	exit $ret
+fi
+
+if [ $update_first -eq 1 ]; then
+	mkarchroot -u "$copydir"
+fi
+
+if [ "$install_before" != "" ]; then
+	mkarchroot -r "pacman -S --noconfirm $install_before" "$copydir"
+fi
+
+# bind build dir
+[ -d "$copydir/build" ] || mkdir "$copydir/build"
+mount -o bind ${WORKDIR} ${copydir}/build
+
+# read .makpekg.conf even if called via sudo
+if [ -n "${SUDO_USER}" ]; then
+	makepkg_conf="/$(eval echo ~${SUDO_USER})/.makepkg.conf"
+else
+	makepkg_conf="~/.makepkg.conf"
+fi
+
+# Get SRC/PKGDEST from makepkg.conf
+if [ -f "${makepkg_conf}" ]; then
+	eval $(grep '^SRCDEST=' "${makepkg_conf}")
+	eval $(grep '^PKGDEST=' "${makepkg_conf}")
+
+	eval $(grep '^MAKEFLAGS=' "${makepkg_conf}")
+	eval $(grep '^PACKAGER=' "${makepkg_conf}")
+fi
+[ -z "${SRCDEST}" ] && eval $(grep '^SRCDEST=' /etc/makepkg.conf)
+[ -z "${PKGDEST}" ] && eval $(grep '^PKGDEST=' /etc/makepkg.conf)
+
+# check if PKGDEST is set, if not symlink pkgdest to build dir
+#if [ -z "${PKGDEST}" ]; then
+#	(cd ${copydir}; ln -s build pkgdest)
+#else
+#	mkdir ${copydir}/pkgdest
+#	mount -o bind ${PKGDEST} ${copydir}/pkgdest
+#fi
+if [ ! -z "${PKGDEST}" ]; then
+	if ! grep 'PKGDEST="/pkgdest"' "$copydir/etc/makepkg.conf" >/dev/null 2>&1; then
+		echo 'PKGDEST="/pkgdest"' >> "$copydir/etc/makepkg.conf"
+	fi
+	[ ! -d ${copydir}/pkgdest ] && mkdir ${copydir}/pkgdest
+	mount -o bind ${PKGDEST} ${copydir}/pkgdest
+fi
+
+# check if SRCDEST is set, if not symlink srcdest to build dir
+#if [ -z "${SRCDEST}" ]; then
+#	(cd ${copydir}; ln -s build srcdest)
+#else
+#	mkdir ${copydir}/srcdest
+#	mount -o bind ${SRCDEST} ${copydir}/srcdest
+#fi
+if [ ! -z "${SRCDEST}" ]; then
+	if ! grep 'SRCDEST="/srcdest"' "$copydir/etc/makepkg.conf" >/dev/null 2>&1; then
+		echo 'SRCDEST="/srcdest"' >> "$copydir/etc/makepkg.conf"
+	fi
+	[ ! -d ${copydir}/srcdest ] && mkdir ${copydir}/srcdest
+	mount -o bind ${SRCDEST} ${copydir}/srcdest
+fi
+
+[ -z "${MAKEFLAGS}" ] && eval $(grep '^MAKEFLAGS=' /etc/makepkg.conf)
+if [ -n "${MAKEFLAGS}" ]; then 
+  sed -i '/^MAKEFLAGS=/d' "$copydir/etc/makepkg.conf"
+  echo "MAKEFLAGS='${MAKEFLAGS}'" >> "$copydir/etc/makepkg.conf"
+fi
+
+[ -z "${PACKAGER}" ] && eval $(grep '^PACKAGER=' /etc/makepkg.conf)
+if [ -n "${PACKAGER}" ]; then 
+  sed -i '/^PACKAGER=/d' "$copydir/etc/makepkg.conf"
+  echo "PACKAGER='${PACKAGER}'" >> "$copydir/etc/makepkg.conf"
+fi
+
+if [ -n "${SUDO_USER}" ]; then
+	cp -a /etc/{passwd,group} ${copydir}/etc/
+	builduser=${SUDO_USER}
+else
+	builduser=nobody
+fi
+
+[ -d ${copydir}/build ] && chown -R ${builduser} ${copydir}/build
+[ -d ${copydir}/srcdest ] && chown -R ${builduser} ${copydir}/srcdest
+[ -d ${copydir}/pkgdest ] && chown -R ${builduser} ${copydir}/pkgdest
+
+echo "${builduser} ALL = NOPASSWD: /usr/bin/pacman" > "$copydir/etc/sudoers.d/${builduser}-pacman"
+chmod 440 "$copydir/etc/sudoers.d/${builduser}-pacman"
+
+#This is a little gross, but this way the script is recreated every time in the
+#working copy
+(cat <<EOF
+#!/bin/bash
+export LANG=C
+cd /build
+export HOME=/build
+sudo -u ${builduser} makepkg $MAKEPKG_ARGS || touch BUILD_FAILED
+[ -f BUILD_FAILED ] && exit 1
+which namcap &>/dev/null && namcap /build/PKGBUILD /pkgdest/*.pkg.tar.* > /build/namcap.log
+exit 0
+EOF
+) > "$copydir/chrootbuild"
+chmod +x "$copydir/chrootbuild"
+
+if mkarchroot -r "/chrootbuild" "$copydir"; then
+	for pkgfile in "${copydir}"/pkgdest/*.pkg.tar.*; do
+		[ -e "$pkgfile" ] || continue
+		if [ "$add_to_db" -eq "1" ]; then
+			mkdir -p "${copydir}/repo"
+			pushd "${copydir}/repo" >/dev/null
+			cp "$pkgfile" .
+			repo-add repo.db.tar.gz "$(basename "$pkgfile")"
+			popd >/dev/null
+		fi
+	done
+else
+	#just in case. We returned 1, make sure we fail
+	touch "${copydir}/build/BUILD_FAILED"
+fi
+
+if [ -e "${copydir}/build/BUILD_FAILED" ]; then
+	echo "Build failed, check $copydir/build"
+	rm "${copydir}/build/BUILD_FAILED"
+	unbind
+	exit 1
+fi
+
+unbind
+

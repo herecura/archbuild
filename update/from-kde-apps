@@ -29,7 +29,12 @@ else
 	> PKGBUILD-updated
 	mv PKGBUILD-updated PKGBUILD
 	makepkg -g >> PKGBUILD
-	rm -rf src 
-	buildone
+	mkpres=$?
+	rm -rf src
+	if [ $mkpres -eq 0 ]; then
+		buildone
+	else
+		git checkout PKGBUILD
+	fi
 fi
 )

@@ -117,6 +117,11 @@ else
     rm -f *.log{,.*}
     pushd ${packagesdir}/${_arch}
     find -name "${thisfolder##*/}*" -mmin +30 -delete
+    if [ "$gpgkeyf" != "" ]; then
+      for pkgfile in $(find -type f -name "${thisfolder##*/}*"); do
+        echo "$gpgpass" | gpg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign "$pkgfile"
+      done
+    fi
     repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
     popd
   else

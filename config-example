@@ -17,3 +17,7 @@ SyncRepo=/path/to/syncscript
 
 # mailto
 mailto='nobody@example.com'
+
+# signing stuff
+gpgkeyf=add your long gpg id here (16char)
+gpgpass=pass for signing

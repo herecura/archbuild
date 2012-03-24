@@ -7,11 +7,10 @@ function regenRepo() {
 [ "$1" = "" ] && return 1
 packagesdir=${dest}/${repository/-any/}/${1}
 cd ${packagesdir}
-if [ "$2" = "clean" ]
-then
-  rm -f ${repository}.db.tar.*
+if [ "$2" = "clean" ]; then
+	rm -f ${repository}.db.tar.*
 fi
-repo-add ${repository}.db.tar.gz *.pkg.tar.*
+repo-add ${repository}.db.tar.gz *.pkg.tar.?z
 }
 
 if [ "${rarch}" = "any" ]; then

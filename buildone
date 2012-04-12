@@ -122,7 +122,7 @@ else
         echo "$gpgpass" | gpg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign "$pkgfile"
       done
     fi
-    repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.*
+    repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.tar.?z
     popd
   else
     echo "package ${thisfolder##*/}-${pkgver}-${_arch}.pkg failed"

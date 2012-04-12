@@ -176,7 +176,7 @@ if [ "${mailto}" != "" ]; then
   elif [ ${mkres} -eq 2 ]; then
     # package failed
     logfiles=""
-    for logfile in $(find . -type f -name '*.log'); do
+    for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
       logfiles="$logfiles -a $logfile"
     done
     echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} failed ${date}"$logfiles ${mailto}

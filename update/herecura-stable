@@ -14,6 +14,7 @@ buildqueue-add \
 	"~/archbuild/update/kcm-qt-graphicssystem" \
 	"~/archbuild/update/kcm-wacomtablet" \
 	"~/archbuild/update/kmtail" \
+	"~/archbuild/update/knights" \
 	"~/archbuild/update/kpartsplugin" \
 	"~/archbuild/update/kpassgen" \
 	"~/archbuild/update/kps" \

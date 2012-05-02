@@ -33,5 +33,3 @@ buildqueue-add \
 	"cd ${rpdir}" \
 	"git push origin master"
 
-
-	#"~/archbuild/update/opera" \

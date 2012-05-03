@@ -191,7 +191,7 @@ usage() {
 	exit 1
 }
 
-while getopts 'hcudr:I:l:n' arg; do
+while getopts 'hcudr:I:y:l:n' arg; do
 	case "$arg" in
 		h) usage ;;
 		c) clean_first=true ;;

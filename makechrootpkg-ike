@@ -386,7 +386,7 @@ cat >"$copydir/chrootbuild" <<EOF
 #!/bin/bash
 . /etc/profile
 export LANG=C
-export HOME=/build
+#export HOME=/build
 
 cd /build
 sudo -u $builduser makepkg $makepkg_args || touch BUILD_FAILED

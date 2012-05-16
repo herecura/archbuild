@@ -369,7 +369,7 @@ fi
 eval $(grep '^CARCH=' "$copydir/etc/makepkg.conf")
 export CARCH
 
-chown -R $builduser "$copydir"/{build,pkgdest,srcdest}
+chown -R $builduser "$copydir"/{home,build,pkgdest,srcdest}
 
 cat > "$copydir/etc/sudoers.d/nobody-pacman" <<EOF
 Defaults env_keep += "HOME"
@@ -386,7 +386,7 @@ cat >"$copydir/chrootbuild" <<EOF
 #!/bin/bash
 . /etc/profile
 export LANG=C
-#export HOME=/build
+export HOME=/home
 
 cd /build
 sudo -u $builduser makepkg $makepkg_args || touch BUILD_FAILED

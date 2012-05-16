@@ -73,6 +73,8 @@ stat_done() {
 cleanup() {
 	trap - EXIT INT QUIT TERM
 
+	[[ -d "$copydir/build/.gnupg" ]] && rm -rf "$copydir/build/.gnupg"
+
 	unbind
 	[[ $1 ]] && exit $1
 }
@@ -346,12 +348,12 @@ if [[ ! -z "${SRCDEST}" ]]; then
 	mount -o bind ${SRCDEST} ${copydir}/srcdest
 fi
 
-if [[ -n $MAKEFLAGS ]]; then 
+if [[ -n $MAKEFLAGS ]]; then
 	sed -i '/^MAKEFLAGS=/d' "$copydir/etc/makepkg.conf"
 	echo "MAKEFLAGS='${MAKEFLAGS}'" >> "$copydir/etc/makepkg.conf"
 fi
 
-if [[ -n $PACKAGER ]]; then 
+if [[ -n $PACKAGER ]]; then
 	sed -i '/^PACKAGER=/d' "$copydir/etc/makepkg.conf"
 	echo "PACKAGER='${PACKAGER}'" >> "$copydir/etc/makepkg.conf"
 fi

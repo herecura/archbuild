@@ -160,7 +160,7 @@ fi
 if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
 		# i maintain this so upload on success to aur
     makepkg --source
-    aurup $(ls -1 *.src.tar.gz) $(cat AUR)
+    burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
     rm -rf *.src.tar.gz src/
 fi
 

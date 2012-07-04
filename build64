@@ -3,8 +3,10 @@ source $(dirname $0)/config
 
 sudo mkarchroot -u ${arch64}/root
 
-## init
-thisfolder=`pwd`
-SRCDEST=${sourcesdir} sudo makechrootpkg-ike -r ${arch64} $@
+if [ $? -eq 0 ]; then
+  ## init
+  thisfolder=`pwd`
+  SRCDEST=${sourcesdir} sudo makechrootpkg-ike -r ${arch64} $@
+fi
 
 # vim:set ts=2 sw=2 et:

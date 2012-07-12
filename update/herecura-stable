@@ -3,8 +3,6 @@ source $(dirname $0)/../config
 
 buildqueue-add \
 	"~/archbuild/update/atunes" \
-	"~/archbuild/update/closure-compiler" \
-	"~/archbuild/update/closure-linter" \
 	"~/archbuild/update/colibri" \
 	"~/archbuild/update/flacon" \
 	"~/archbuild/update/hamsimanager" \
@@ -25,7 +23,6 @@ buildqueue-add \
 	"~/archbuild/update/nntpgrab" \
 	"~/archbuild/update/pdfminer" \
 	"~/archbuild/update/php-mongo" \
-	"~/archbuild/update/python2-gflags" \
 	"~/archbuild/update/python2-pymongo" \
 	"~/archbuild/update/python2-yenc" \
 	"~/archbuild/update/sabnzbd" \
@@ -33,3 +30,7 @@ buildqueue-add \
 	"cd ${rpdir}" \
 	"git push origin master"
 
+# in community
+#	"~/archbuild/update/closure-compiler" \
+#	"~/archbuild/update/closure-linter" \
+#	"~/archbuild/update/python2-gflags" \

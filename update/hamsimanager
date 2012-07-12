@@ -13,7 +13,7 @@ cd stable-any/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://hamsiapps.com/en/HamsiManager | grep -m1 -ie "<span.*release_notes" | sed 's,.*>[A-Za-z ]*\([0-9\.]*\)</a>.*,\1,')
+nwVersion=$(wget -q -O- http://hamsiapps.com/en/HamsiManager | grep -m1 -ie "<a.*release_notes" | sed 's,.*>[A-Za-z ]*\([0-9\.]*\)</a>.*,\1,')
 
 if [ "${nwVersion}" = "${pkgver}" ]; then
 	echo "${appname} :: is already on the latest version"

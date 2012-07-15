@@ -1,23 +1,19 @@
 #!/bin/bash
-source $(dirname $0)/../config
-
-cd ${rpdir}
-git pull origin master
+source $(dirname $0)/../config-archlinux
 
 appname=python2-gflags
 
 (
-# cd to folder of ${appname}
-cd stable-any/${appname}
+cd "$rpdir"
+communityco "$appname"
+cd "$appname/trunk"
 
 source PKGBUILD
 
 # get version from site
 nwVersion=$(wget -q -O- http://code.google.com/p/python-gflags/downloads/list | grep -m1 -ie "<a.*python-gflags-[0-9\.]*\.tar\.gz.*Download" | sed 's,.*python-gflags-\([0-9\.]*\)\.tar\.gz.*,\1,')
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
 
 	cat PKGBUILD |\
@@ -28,11 +24,13 @@ else
 	mv PKGBUILD-updated PKGBUILD
 	makepkg -g >> PKGBUILD
 	mkpres=$?
-	rm -rf src
 	if [ $mkpres -eq 0 ]; then
-		buildone
+		buildone-archlinux
+		if [ $? -ne 0 ]; then
+			svn revert PKGBUILD
+		fi
 	else
-		git checkout PKGBUILD
+		svn revert PKGBUILD
 	fi
 fi
 )

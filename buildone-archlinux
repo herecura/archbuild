@@ -1,0 +1,79 @@
+#!/bin/bash
+source $(dirname $0)/config-archlinux
+
+if [ "$1" != "" ]; then
+  cd "$1"
+fi
+
+## build function
+function buildInChroot() {
+if [ "$1" == "any" ]; then
+  _arch=$1
+  buildx="build64 -l archbuild -c"
+elif [ "$1" == "x86_64" ]; then
+  _arch=$1
+  buildx="build64 -l archbuild -c"
+elif [ "$1" == "i686" ]; then
+  _arch=$1
+  buildx="build32 -l archbuild -c"
+else
+  _arch='any'
+  buildx="build64 -l archbuild -c"
+fi
+buildx="${buildx} -- -c --log"
+eval "${buildx}"
+return $?
+}
+
+mkres=0
+source PKGBUILD
+if [ "$pkgbase" = "" ]; then
+  pkgbase="$pkgname"
+fi
+echo "run makepkg for $pkgbase"
+for _arch in ${arch[@]}; do
+  echo ${_arch}
+  buildInChroot ${_arch}
+  result=$?
+  if [[ $mkres -eq 0 && $result -ne 0 ]]; then
+    mkres=$result
+  fi
+done
+source PKGBUILD
+
+# on success build commit into the svn tree and put into arch database
+if [ ${mkres} -eq 0 ]; then
+  gpgsign && \
+    communitypkg "$pkgbase :: $pkgver" && \
+    ssh aur.archlinux.org /arch/db-update
+fi
+
+if [ "${mailto}" != "" ]; then
+  date=$(date +%Y-%m-%d\ %H:%M:%S)
+  if [ ${mkres} -eq 0 ]; then
+    # package success
+    echo "SUCCESS build" | mail -s "archlinux build $pkgbase ${pkgver}-${pkgrel} success ${date}" ${mailto}
+  elif [ ${mkres} -eq 1 ]; then
+    # package exists
+    echo "no mail for exists"
+    # echo "EXISTS build" | mail -s "archlinux build ${thisfolder##*/} exists ${date}" ${mailto}
+  elif [ ${mkres} -eq 2 ]; then
+    # package failed
+    logfiles=""
+    for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
+      logfiles="$logfiles -a $logfile"
+    done
+    echo "FAILED build" | mail -s "archlinux build $pkgbase ${pkgver}-${pkgrel} failed ${date}"$logfiles ${mailto}
+  else
+    # other failure
+    echo "OTHER FAIL build" | mail -s "archlinux build $pkgbase ${pkgver}-${pkgrel} failed ${date}" ${mailto}
+  fi
+fi
+
+# cleanup
+rm -f *.pkg.* # remove symlinks
+rm -f *.log{,.*}
+rm -rf pkg src
+
+exit ${mkres}
+# vim:set ts=2 sw=2 et:

@@ -1,0 +1,8 @@
+#!/bin/bash
+source $(dirname $0)/config
+
+if [ "$gpgkeyf" != "" ]; then
+	for pkgfile in $(find -name "*.pkg.tar.?z"); do
+		echo "$gpgpass" | gpg --homedir ~/.gnupg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign $pkgfile
+	done
+fi

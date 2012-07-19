@@ -1,0 +1,36 @@
+#!/bin/bash
+source $(dirname $0)/../config
+
+cd ${rpdir}
+git pull origin master
+
+appname=vim
+
+(
+# cd to folder of ${appname}
+cd stable/${appname}
+
+source PKGBUILD
+
+# get version from site
+nwVersion=$(wget -q -O- https://code.google.com/p/vim/source/list | grep -m1 -ie "<a.*Added tag.*for changeset.*" | sed -e 's,.*Added tag v\([0-9-]*\).*,\1,' -e 's,-,.,g')
+baseVersion=$(echo $nwVersion | sed -e 's/\([0-9]*\.[0-9]*\)\.\([0-9]*\)/\1/')
+patchLevel=$(echo $nwVersion | sed -e 's/\([0-9]*\.[0-9]*\)\.\([0-9]*\)/\2/')
+
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
+	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
+
+	cat PKGBUILD |\
+	sed -e "s/^_basever=.*/_basever=${baseVersion}/g" \
+		-e "s/^_patchlevel=.*/_patchlevel=${patchLevel}/g" \
+		-e "s/^pkgrel=.*/pkgrel=1/g" \
+	> PKGBUILD-updated
+	mv PKGBUILD-updated PKGBUILD
+	mkpres=$?
+	if [ $mkpres -eq 0 ]; then
+		buildone
+	else
+		git checkout PKGBUILD
+	fi
+fi
+)

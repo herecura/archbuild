@@ -29,6 +29,7 @@ if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	mkpres=$?
 	if [ $mkpres -eq 0 ]; then
 		buildone
+		[ $? -eq 0 ] && git push
 	else
 		git checkout PKGBUILD
 	fi

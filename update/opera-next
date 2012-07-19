@@ -10,6 +10,7 @@ if [ $? -eq 0 ]; then
 	if [ $? -ne 0 ]; then
 		cd ${rpdir}
 		buildone '' testing/opera-next
+		[ $? -eq 0 ] && git push
 	fi
 else
 	git checkout ${filename}

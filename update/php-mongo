@@ -13,11 +13,9 @@ cd stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://pecl.php.net/package/mongo | grep -m1 -ie "\/get\/mongo-[0-9\.]*" | sed 's,.*<a.*mongo-\([0-9\.]*\)\.tgz.*,\1,')
+nwVersion=$(wget -q -O- http://pecl.php.net/package/mongo | grep -m1 -ie "\/get\/mongo-[0-9\.]*\.tgz" | sed 's,.*<a.*mongo-\([0-9\.]*\)\.tgz.*,\1,')
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
 
 	cat PKGBUILD |\

@@ -13,11 +13,9 @@ cd stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlindent/ | grep -ie "<a\ href=.*\/xmlindent.*tar\.gz"  | sed 's,.*<a href=".*title=.*xmlindent-\(.*\)\.tar\.gz.*,\1,')
+nwVersion=$(wget -q -O- http://sourceforge.net/projects/xmlindent/ | grep -m1 -ie "<a\ href=.*\/xmlindent.*tar\.gz"  | sed 's,.*<a href=".*title=.*xmlindent-\(.*\)\.tar\.gz.*,\1,')
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
 
 	cat PKGBUILD |\

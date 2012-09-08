@@ -13,11 +13,9 @@ cd stable/${appname}
 source PKGBUILD
 
 # get version from site
-nwVersion=$(wget -q -O- http://sourceforge.net/projects/lirc/ | grep -ie "<a\ href=.*\/lirc.*tar\.bz2" | sed 's,.*<a href=".*title=.*lirc-\(.*\)\.tar\.bz2.*,\1,')
+nwVersion=$(wget -q -O- http://sourceforge.net/projects/lirc/ | grep -m1 -ie "<a\ href=.*\/lirc.*tar\.bz2" | sed 's,.*<a href=".*title=.*lirc-\(.*\)\.tar\.bz2.*,\1,')
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
 
 	cat PKGBUILD |\

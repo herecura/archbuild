@@ -3,8 +3,11 @@ source $(dirname $0)/../config
 
 cd ${rpdir}
 cd testing/opera-next
+source PKGBUILD
+oldVer=$pkgver
 wget -O PKGBUILD http://snapshot.opera.com/unix/latest/.unsupported/PKGBUILD
-if [ $? -eq 0 ]; then
+source PKGBUILD
+if [ $? -eq 0 ] && [ $(vercmp "$pkgver" "$oldVer") -gt 0 ]; then
 	sed -e 's/#_opdistro/_opdistro/' -i PKGBUILD
 	git diff --no-ext-diff --quiet --exit-code PKGBUILD
 	if [ $? -ne 0 ]; then

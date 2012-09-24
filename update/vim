@@ -23,6 +23,7 @@ if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	cat PKGBUILD |\
 	sed -e "s/^_basever=.*/_basever=${baseVersion}/g" \
 		-e "s/^_patchlevel=.*/_patchlevel=${patchLevel}/g" \
+		-e 's/^__hgrev=.*/__hgrev=v${pkgver\/\/.\/-}/g' \
 		-e "s/^pkgrel=.*/pkgrel=1/g" \
 	> PKGBUILD-updated
 	mv PKGBUILD-updated PKGBUILD

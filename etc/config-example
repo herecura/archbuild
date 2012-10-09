@@ -1,5 +1,5 @@
-#!/bin/bash
-PATH=$PATH:$(cd $(dirname $BASH_SOURCE) && pwd)
+# log
+logfile="$varPath/log/archbuild-commands.log"
 
 # path
 rpdir=/path/to/pkgbuilds
@@ -19,5 +19,5 @@ SyncRepo=/path/to/syncscript
 mailto='nobody@example.com'
 
 # signing stuff
-gpgkeyf=add your long gpg id here (16char)
-gpgpass=pass for signing
+gpgkeyf='add your long gpg id here (16char)'
+gpgpass='pass for signing'

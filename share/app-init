@@ -1,9 +1,17 @@
 # initialize default path locations
 initPath=$(cd $(dirname $BASH_SOURCE) && pwd)
 startPath=$(cd "$initPath/../" > /dev/null 2>&1 && pwd)
-binPath=$(cd "$startPath/bin" > /dev/null 2>&1 && pwd)
-etcPath=$(cd "$startPath/etc" > /dev/null 2>&1 && pwd)
-sharePath=$(cd "$startPath/share" > /dev/null 2>&1 && pwd)
+binPath="$startPath/bin"
+[ ! -d "$binPath" ] && mkdir -p "$binPath"
+etcPath="$startPath/etc"
+[ ! -d "$etcPath" ] && mkdir -p "$etcPath"
+sharePath="$startPath/share"
+[ ! -d "$sharePath" ] && mkdir -p "$sharePath"
+varPath="$startPath/var"
+[ ! -d "$varPath" ] && mkdir -p "$varPath"
+
+PATH=$PATH:$binPath
+
 source "$sharePath/functions"
 
 # vim:set ft=sh:

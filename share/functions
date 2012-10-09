@@ -66,4 +66,11 @@ function log() {
 	fi
 }
 
+# logfile must be defined !!
+if [ "$logfile" == "" ]
+then
+	errmsg "logfile configuration option must be defined"
+	exit 1
+fi
+
 # vim:set ft=sh:

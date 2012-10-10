@@ -59,10 +59,12 @@ function warning() {
 stat_busy() {
 	local mesg=$1; shift
 	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
+	log "==> $mesg..."
 }
 
 stat_done() {
 	printf "${BOLD}done${ALL_OFF}\n" >&2
+	log "done"
 }
 
 function log() {

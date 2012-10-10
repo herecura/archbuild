@@ -3,10 +3,6 @@ logfile="$varPath/log/archbuild-commands.log"
 
 # path
 rpdir=/path/to/pkgbuilds
-dest=/path/to/repository
-
-# sources path
-sourcesdir=/path/to/sources
 
 # chroot paths
 arch32=/path/to/32bit/chroot

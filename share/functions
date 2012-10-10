@@ -12,6 +12,11 @@ if [[ -t 2 ]]; then
 fi
 readonly ALL_OFF BOLD GREEN RED YELLOW BLUE
 
+plain() {
+	local mesg=$1; shift
+	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&2
+}
+
 function msg() {
 	local mesg=$1; shift;
 	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" >&2;
@@ -49,6 +54,15 @@ function error() {
 function warning() {
 	printf " ${YELLOW}WARNING${ALL_OFF}\n" >&2;
 	return 0;
+}
+
+stat_busy() {
+	local mesg=$1; shift
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
+}
+
+stat_done() {
+	printf "${BOLD}done${ALL_OFF}\n" >&2
 }
 
 function log() {

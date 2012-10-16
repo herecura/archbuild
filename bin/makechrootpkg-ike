@@ -49,7 +49,7 @@ trap_exit() {
 }
 
 die() {
-	error "$*"
+	errmsg "$*"
 	cleanup 1
 }
 

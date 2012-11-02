@@ -1,12 +1,11 @@
-# log
-logfile="$varPath/log/archbuild-commands.log"
+# queue
+queuedir=/path/to/queue
 
 # path
 rpdir=/path/to/pkgbuilds
 
 # chroot paths
-arch32=/path/to/32bit/chroot
-arch64=/path/to/64bit/chroot
+chroots=/path/to/chroots
 
 # SyncRepo
 SyncRepo=/path/to/syncscript
@@ -17,3 +16,7 @@ mailto='nobody@example.com'
 # signing stuff
 gpgkeyf='add your long gpg id here (16char)'
 gpgpass='pass for signing'
+
+# log
+logfile="$varPath/log/archbuild-commands.log"
+queuelog="$varPath/log/buildqueue.log"

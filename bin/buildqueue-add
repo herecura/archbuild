@@ -1,6 +1,7 @@
 #!/bin/bash
-source $(dirname $0)/buildqueue.conf
+source "$(dirname $0)/../share/app-init"
 
+msg "adding commands to the buildqueue"
 tmpfile=$(mktemp)
 
 for command in "$@"
@@ -9,3 +10,4 @@ do
 done
 
 mv ${tmpfile} ${queuedir}
+stat_done

@@ -1,4 +1,6 @@
 #!/bin/bash
-source $(dirname $0)/buildqueue.conf
+source "$(dirname $0)/../share/app-init"
 
+msg "view buildqueue log"
 $EDITOR ~/log/buildqueue.log
+stat_done

@@ -1,8 +1,0 @@
-#!/bin/bash
-source $(dirname $0)/config
-
-user=$1
-shift
-commands="$@"
-
-sudo mkarchroot -r "$commands" "$arch64/$user"

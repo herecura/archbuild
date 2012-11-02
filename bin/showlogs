@@ -1,5 +1,6 @@
 #!/bin/bash
-source $(dirname $0)/config
+source "$(dirname $0)/../share/app-init"
 
+msg "Show logs left in package directories"
 cd ${rpdir}
 find -maxdepth 3 -name "*.log" | sort | sed 's/\.\///g' 

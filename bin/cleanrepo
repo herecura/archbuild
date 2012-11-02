@@ -1,7 +1,12 @@
 #!/bin/bash
-source $(dirname $0)/config
+source "$(dirname $0)/../share/app-init"
 
-source repository
+if [ -e repository ]; then
+	source repository
+else
+	errmsg "You must run this script inside a repository"
+	exit 1
+fi
 
 returndir=`pwd`
 
@@ -18,11 +23,11 @@ do
 done
 
 function cleanRepo() {
-[ "$1" = "" ] && return 1
-packagesdir=${dest}/${repository/-any/}/${1}
-cd ${packagesdir}
-ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)"
-rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)")
+	[ "$1" = "" ] && return 1
+	packagesdir=${dest}/${repository/-any/}/${1}
+	cd ${packagesdir}
+	ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)"
+	rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${dest}/${repository}.txt)")
 }
 
 if [ "${rarch}" = "any" ]; then

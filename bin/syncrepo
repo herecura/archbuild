@@ -1,3 +1,5 @@
 #!/bin/bash
-source $(dirname $0)/config
+source "$(dirname $0)/../share/app-init"
+
+msg "Sync repo"
 [ -x ${SyncRepo} ] && (${SyncRepo})

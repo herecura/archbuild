@@ -17,7 +17,7 @@ WORKDIR=$PWD
 export LANG=C
 
 cleanup() {
-	trap - EXIT INT QUIT TERM
+	trap - EXIT INT QUIT TERM HUP
 
 	[[ -d "$copydir/build/.gnupg" ]] && rm -rf "$copydir/build/.gnupg"
 
@@ -34,17 +34,15 @@ unbind() {
 }
 
 abort() {
-	msg 'Aborting...'
-	cleanup 0
+	errmsg 'Aborting makechrootpkg ...'
+	cleanup 1
 }
 
 trap_abort() {
-	trap - EXIT INT QUIT TERM HUP
 	abort
 }
 
 trap_exit() {
-	trap - EXIT INT QUIT TERM HUP
 	cleanup 0
 }
 
@@ -366,4 +364,6 @@ fi
 if [[ -e $copydir/build/BUILD_FAILED ]]; then
 	rm "$copydir/build/BUILD_FAILED"
 	die "Build failed, check $copydir/build"
+else
+	cleanup 0
 fi

@@ -162,6 +162,9 @@ for _arch in ${arch[@]}; do
 	fi
 done
 
+# cleanup lockfile so they cant accidentally be commited
+rm -f .lock
+
 source PKGBUILD
 if [ "$pkgbase" = "" ]; then
 	pkgbase=$pkgname

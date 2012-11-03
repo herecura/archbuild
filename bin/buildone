@@ -1,194 +1,257 @@
 #!/bin/bash
-source $(dirname $0)/config
+source "$(dirname $0)/../share/app-init"
 
 if [ ! -z "$1" ]; then
-  commitmsg="$1"
-else
-  commitmsg=""
+	if [ -d "$1" ]; then
+		cd "$1"
+	elif [ -d "$rpdir/$1" ]; then
+		cd "$rpdir/$1";
+	else
+		errmsg "you have to pass an existing directory"
+		exit 1
+	fi
+fi
+
+if [ ! -e PKGBUILD ]; then
+	errmsg "this script must be run with a directory containing a PKGBUILD"
+	exit 1
 fi
 
 if [ ! -z "$2" ]; then
-  cd "$2"
+	commitmsg="$2"
+else
+	commitmsg=""
 fi
 
 ## init
+inrepo=1
 thisfolder=`pwd`
-source ../repository
-packagesdir=${dest}/${repository/-any/}
+if [ -e ../repository ]; then
+	source ../repository
+	inrepo=0
+fi
+
+if [ $inrepo -eq 0 ]; then
+	packagesdir=${pkgrepo}/${repository}/pool/
+	[ ! -d ${packagesdir} ] && mkdir -p ${packagesdir}
+	case $repository in
+		*herecura*)
+			buildbase='herecura'
+			;;
+		*)
+			buildbase='extra'
+			;;
+	esac
+else
+	buildbase='extra'
+fi
 
 ## build function
 function buildInChroot() {
 install_what=""
 if [ ${#makedepends[@]} -gt 0 ]; then
-  for dp in ${makedepends[@]}; do
-    case ${dp} in
-      git)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}git"
-        ;;
-      subversion)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}subversion"
-        ;;
-      mercurial)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}mercurial"
-        ;;
-      bzr)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}bzr"
-        ;;
-      arch)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}arch"
-        ;;
-      darcs)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}darcs"
-        ;;
-      cvs)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}cvs"
-        ;;
-      monotone)
-        if [ "${install_what}" != "" ]; then
-          install_what="${install_what} "
-        fi
-        install_what="${install_what}monotone"
-        ;;
-    esac
-  done
+	for dp in ${makedepends[@]}; do
+		case ${dp} in
+			git)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}git"
+				;;
+			subversion)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}subversion"
+				;;
+			mercurial)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}mercurial"
+				;;
+			bzr)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}bzr"
+				;;
+			arch)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}arch"
+				;;
+			darcs)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}darcs"
+				;;
+			cvs)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}cvs"
+				;;
+			monotone)
+				if [ "${install_what}" != "" ]; then
+					install_what="${install_what} "
+				fi
+				install_what="${install_what}monotone"
+				;;
+		esac
+	done
 fi
 if [ "$install_what" != "" ]; then
-  install_before=" -y '${install_what}'"
+	install_before=" -y '${install_what}'"
 fi
 if [ "$1" == "any" ]; then
-  _arch=$1
-  buildx="build64 -l archbuild -c${install_before}"
-elif [ "$1" == "x86_64" ]; then
-  _arch=$1
-  buildx="build64 -l archbuild -c${install_before}"
-elif [ "$1" == "i686" ]; then
-  _arch=$1
-  buildx="build32 -l archbuild -c${install_before}"
+	_arch=$1
+	buildx="sudo $buildbase-x86_64-build"
 else
-  _arch='any'
-  buildx="build64 -l archbuild -c${install_before}"
+	_arch=$1
+	buildx="sudo $buildbase-$_arch-build"
 fi
+buildopts=" -- -l archbuild -c${install_before}"
 if [ ${keepsource} -eq 1 ]; then
-  buildx="${buildx} -- --log"
+	buildopts="${buildopts} -- --log"
 else
-  buildx="${buildx} -- -c --log"
+	buildopts="${buildopts} -- -c --log"
 fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
-if [[ ${testing} -eq 0 && -e "${packagesdir}/${_arch}/${fullpkg}" ]]; then
-  echo "package ${thisfolder##*/}-${pkgver} .pkg already exists"
-  return 1
+if [[ ${testing} -eq 0 && -e "${packagesdir}/${fullpkg}" ]]; then
+	msg "package $fullpkg already exists"
+	return 250
 else
-  if [ -d ${packagesdir}/${_arch} ]; then
-    echo "packagesdir exists"
-  else
-    mkdir -p ${packagesdir}/${_arch}
-    if [ $? -eq 0 ]; then
-      echo "packagesdir created"
-    else
-      echo "failed to create packagesdir EXIT"
-      return 3
-    fi
-  fi
-  PKGDEST=${packagesdir}/${_arch} ${buildx}
-  if [ $? -eq 0 ]; then
-    echo "package ${thisfolder##*/}-${pkgver}-${_arch}.pkg successfully built"
-    rm -f *.pkg.* # remove symlinks
-    rm -f *.log{,.*}
-    pushd ${packagesdir}/${_arch}
-    find -name "${thisfolder##*/}*" -mmin +30 -delete
-    if [ "$gpgkeyf" != "" ]; then
-      for pkgfile in $(find -type f -name "${thisfolder##*/}*"); do
-        echo "$gpgpass" | gpg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign "$pkgfile"
-      done
-    fi
-    repo-add ${repository}.db.tar.gz ${thisfolder##*/}*.pkg.tar.?z
-    popd
-  else
-    echo "package ${thisfolder##*/}-${pkgver}-${_arch}.pkg failed"
-    return 2
-  fi
-  return 0
+	buildcmd="${buildx}${buildopts}"
+	eval ${buildcmd}
+	buildret=$?
+	if [ $buildret -eq 0 ]; then
+		msg "package $fullpkg successfully built"
+		return 0
+	elif [ $buildret -eq 255 ]; then
+		errmsg "creating build environment failed"
+		msg "retry with clean build environment"
+		buildcmd="${buildx} -c${buildopts}"
+		eval ${buildcmd}
+		if [ $? -eq 0 ]; then
+			msg "package $fullpkg successfully built"
+			return 0
+		else
+			errmsg "package $fullpkg failed"
+			return 241
+		fi
+	else
+		errmsg "package $fullpkg failed"
+		return 240
+	fi
 fi
-return 0
+return 254
 }
 
 mkres=0
 source PKGBUILD
-echo "run makepkg for ${thisfolder##*/}"
+msg "run makepkg for ${pkgname}"
 for _arch in ${arch[@]}; do
-  echo ${_arch}
-  buildInChroot ${_arch}
-  result=$?
-  if [[ $mkres -eq 0 && $result -ne 0 ]]; then
-    mkres=$result
-  fi
+	msg2 ${_arch}
+	buildInChroot ${_arch}
+	result=$?
+	if [[ $mkres -eq 0 && $result -ne 0 ]]; then
+		mkres=$result
+	fi
 done
+
 source PKGBUILD
-
-# on success build commit into git tree
-if [ ${mkres} -eq 0 ]; then
-  git add .
-  finalcommitmsg="${thisfolder##*/} :: ${pkgver}-${pkgrel}"
-  if [ "$commitmsg" != "" ]; then
-    finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
-  fi
-  git commit -sm "${finalcommitmsg}"
+if [ "$pkgbase" = "" ]; then
+	pkgbase=$pkgname
 fi
+fullpkg=${pkgbase}-${pkgver}-${pkgrel}
+if [ $inrepo -eq 0 ]; then
+	if [ ${mkres} -eq 0 ]; then
+		msg "package $fullpkg successfully built"
+		gpgsign
+		msg "move packages into package pool"
+		mv *.pkg.tar.?z *.pkg.tar.?z.sig ${packagesdir}
 
-# if i maintain it in aur upload
-if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
+		for _arch in ${rarch[@]}; do
+			archpkgdir=${pkgrepo}/${repository}/${_arch}
+			[ ! -d ${archpkgdir} ] && mkdir -p ${archpkgdir}
+			pushd ${archpkgdir}
+			for _pkgname in ${pkgname[@]}; do
+				if [ "${arch}" == "any" ]; then
+					ln -s ../pool/${_pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.?z
+					ln -s ../pool/${_pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.?z.sig
+					toremove=$(ls ${_pkgname}*.pkg.tar.?z* | grep -ev "${_pkgname}-${pkgver}-${pkgrel}-any.pkg.tar.?z" 2>/dev/null)
+					if [ $? -eq 0 ]; then
+						echo $toremove
+						rm $toremove
+					fi
+				else
+					ln -s ../pool/${_pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.?z
+					ln -s ../pool/${_pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.?z.sig
+					toremove=$(ls ${_pkgname}*.pkg.tar.?z* | grep -ev "${_pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.?z" 2>/dev/null)
+					if [ $? -eq 0 ]; then
+						echo $toremove
+						rm $toremove
+					fi
+				fi
+			done
+			popd
+		done
+		pushd ../
+		regenrepo
+		popd
+	fi
+
+	# on success build commit into git tree
+	if [ ${mkres} -eq 0 ]; then
+		msg "commit sucessfull package"
+		git add .
+		finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"
+		if [ "$commitmsg" != "" ]; then
+			finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
+		fi
+		git commit -sm "${finalcommitmsg}"
+	fi
+
+	# if i maintain it in aur upload
+	if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
 		# i maintain this so upload on success to aur
-    makepkg --source
-    burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
-    rm -rf *.src.tar.gz src/
+		msg "upload the source to AUR"
+		makepkg --source
+		burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
+		rm -rf *.src.tar.gz src/
+	fi
 fi
 
 if [ "${mailto}" != "" ]; then
-  date=$(date +%Y-%m-%d\ %H:%M:%S)
-  if [ ${mkres} -eq 0 ]; then
-    # package success
-    echo "SUCCESS build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} success ${date}" ${mailto}
-  elif [ ${mkres} -eq 1 ]; then
-    # package exists
-    echo "no mail for exists"
-    # echo "EXISTS build" | mail -s "archbuild ${thisfolder##*/} exists ${date}" ${mailto}
-  elif [ ${mkres} -eq 2 ]; then
-    # package failed
-    logfiles=""
-    for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
-      logfiles="$logfiles -a $logfile"
-    done
-    echo "FAILED build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} failed ${date}"$logfiles ${mailto}
-  else
-    # other failure
-    echo "OTHER FAIL build" | mail -s "archbuild ${thisfolder##*/} ${pkgver}-${pkgrel} failed ${date}" ${mailto}
-  fi
+	msg "send mail with the outcome of the build"
+	date=$(date +%Y-%m-%d\ %H:%M:%S)
+	if [ ${mkres} -eq 0 ]; then
+		# package success
+		echo "SUCCESS build" | mail -s "archbuild $fullpkg success ${date}" ${mailto}
+	elif [ ${mkres} -eq 250 ]; then
+		# package exists
+		echo "no mail for exists"
+		# echo "EXISTS build" | mail -s "archbuild ${thisfolder##*/} exists ${date}" ${mailto}
+	elif [ ${mkres} -eq 240 ] || [ ${mkres} -eq 241 ]; then
+		# package failed
+		logfiles=""
+		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
+			logfiles="$logfiles -a $logfile"
+		done
+		echo "FAILED build" | mail -s "archbuild $fullpkg failed ${date}"$logfiles ${mailto}
+	else
+		# other failure
+		echo "OTHER FAIL build" | mail -s "archbuild $fullpkg failed ${date}" ${mailto}
+	fi
 fi
 
-# cleanup
-rm -f *.pkg.* # remove symlinks
-rm -f *.log{,.*}
+msg "cleanup possible leftovers"
+rm -rf pkg/
+rm -f *.pkg.tar.?z*
+rm -f .lock
 
 exit ${mkres}
-# vim:set ts=2 sw=2 et:
+

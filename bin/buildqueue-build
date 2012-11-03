@@ -6,9 +6,9 @@ msg "add new build to buildqueue"
 [ "${1}" = "" ] && errmsg "need at least the location where to build" && exit
 
 if [ "${2}" != "" ]; then
-	buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone '${2}' '${1}'" "git push origin master"
+	buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone '${1}' '${2}'" "git push origin master"
 else
-	buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone '' '${1}'" "git push origin master"
+	buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone '${1}'" "git push origin master"
 fi
 
 stat_done

@@ -20,3 +20,5 @@ gpgpass='pass for signing'
 # log
 logfile="$varPath/log/archbuild-commands.log"
 queuelog="$varPath/log/buildqueue.log"
+
+# vim: ft=sh:

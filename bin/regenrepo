@@ -16,14 +16,14 @@ function regenRepo() {
 		return 1
 	fi
 	msg "regenerate ${repository} for ${1}"
-	packagesdir=${dest}/${repository/-any/}/${1}
+	packagesdir=${pkgrepo}/${repository/-any/}/${1}
 	cd ${packagesdir}
 	if [ "$2" = "clean" ]; then
 		msgExec "remove db"
-		rm -f ${repository}.db.tar.* && success || error
+		rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
 	fi
 	msgExec "run repo-add"
-	repo-add ${repository}.db.tar.gz *.pkg.tar.?z && success || error
+	repo-add ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
 }
 
 if [ "${rarch}" = "any" ]; then

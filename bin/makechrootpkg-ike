@@ -125,7 +125,7 @@ usage() {
 	echo ''
 	echo 'The chroot "root" directory must be created via the following'
 	echo 'command:'
-	echo '    mkarchroot <chrootdir>/root base base-devel sudo'
+	echo '    mkarchroot-ike <chrootdir>/root base base-devel sudo'
 	echo ''
 	echo "Default makepkg args: $makepkg_args"
 	echo ''
@@ -187,13 +187,13 @@ if [[ ! -d $chrootdir ]]; then
 fi
 
 if [[ ! -d $chrootdir/root ]]; then
-	die "Missing chroot dir root directory. Try using: mkarchroot $chrootdir/root base base-devel sudo"
+	die "Missing chroot dir root directory. Try using: mkarchroot-ike $chrootdir/root base base-devel sudo"
 fi
 
 umask 0022
 
 # Lock the chroot we want to use. We'll keep this lock until we exit.
-# Note this is the same FD number as in mkarchroot
+# Note this is the same FD number as in mkarchroot-ike
 exec 9>"$copydir.lock"
 if ! flock -n 9; then
 	stat_busy "Locking chroot copy '$copy'"
@@ -236,7 +236,7 @@ if [[ -n $install_pkg ]]; then
 	pkgname="${install_pkg##*/}"
 	cp "$install_pkg" "$copydir/$pkgname"
 
-	mkarchroot -r "pacman -U /$pkgname --noconfirm" "$copydir"
+	mkarchroot-ike -r "pacman -U /$pkgname --noconfirm" "$copydir"
 	ret=$?
 
 	rm "$copydir/$pkgname"
@@ -245,8 +245,8 @@ if [[ -n $install_pkg ]]; then
 	exit $ret
 fi
 
-$update_first && mkarchroot -u "$copydir"
-[[ $install_before != '' ]] && mkarchroot -r "pacman -S --noconfirm $install_before" "$copydir"
+$update_first && mkarchroot-ike -u "$copydir"
+[[ $install_before != '' ]] && mkarchroot-ike -r "pacman -S --noconfirm $install_before" "$copydir"
 
 [[ ! -d "$copydir/build" ]] && mkdir -p "$copydir/build"
 # bind build dir
@@ -346,7 +346,7 @@ exit 0
 EOF
 chmod +x "$copydir/chrootbuild"
 
-if mkarchroot -r "/chrootbuild" "$copydir"; then
+if mkarchroot-ike -r "/chrootbuild" "$copydir"; then
 	for pkgfile in "$copydir"/build/*.pkg.tar.?z; do
 		if $add_to_db; then
 			mkdir -p "$copydir/repo"

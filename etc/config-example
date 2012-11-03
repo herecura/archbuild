@@ -3,6 +3,7 @@ queuedir=/path/to/queue
 
 # path
 rpdir=/path/to/pkgbuilds
+pkgrepo=/path/to/pkgrepositories
 
 # chroot paths
 chroots=/path/to/chroots

@@ -262,9 +262,11 @@ chroot_mount() {
 	[[ -e "${working_dir}/run" ]] || mkdir "${working_dir}/run"
 	mount -t tmpfs tmpfs "${working_dir}/run" -o mode=0755,nodev,nosuid,strictatime,size=64M
 
-	for host_config in resolv.conf localtime; do
-		bind_mount /etc/$host_config ro
-	done
+	if [ -d "$working_dir/etc" ]; then
+		for host_config in resolv.conf localtime; do
+			cp /etc/$host_config $working_dir/etc/$host_config
+		done
+	fi
 
 	[[ -n $host_mirror_path ]] && bind_mount "$host_mirror_path" ro
 
@@ -298,9 +300,9 @@ trap_chroot_umount () {
 	done
 	[[ -n $host_mirror_path ]] && umount "${working_dir}/${host_mirror_path}"
 
-	for host_config in resolv.conf localtime; do
-		umount "${working_dir}/etc/${host_config}"
-	done
+	#for host_config in resolv.conf localtime; do
+		#umount "${working_dir}/etc/${host_config}"
+	#done
 	umount "${working_dir}/proc/sys"
 	umount "${working_dir}/proc"
 	umount "${working_dir}/sys"

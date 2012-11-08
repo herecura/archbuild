@@ -1,0 +1,12 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [ ! -e PKGBUILD ]; then
+	errmsg "this script must be run with a directory containing a PKGBUILD"
+	exit 1
+fi
+
+msg "upload the source to AUR"
+makepkg --source
+burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
+rm -rf *.src.tar.gz src/

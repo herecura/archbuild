@@ -1,18 +1,16 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
 
-for rpfolder in 'testing-any' 'testing'
+folders=$(ls -1 ${rpdir}/testing)
+for folder in ${folders}
 do
-	folders=$(ls -1 ${rpdir}/${rpfolder})
-	for folder in ${folders}
-	do
-		if [ -d ${rpdir}/${rpfolder}/${folder} ];
-		then
-			buildone '' ${rpfolder}/${folder}
-		fi
-	done
+	msg "try to start build for $folder"
+	if [ -d ${rpdir}/${rpfolder}/${folder} ];
+	then
+		buildone '' ${rpfolder}/${folder}
+	fi
 done
 
 cd ${rpdir}

@@ -10,5 +10,3 @@ if [ "${2}" != "" ]; then
 else
 	buildqueue-add "cd ${rpdir}" "git pull origin master" "buildone '${1}'" "git push origin master"
 fi
-
-stat_done

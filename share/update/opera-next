@@ -1,10 +1,11 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
 cd testing/opera-next
 source PKGBUILD
 oldVer=$pkgver
+msg "get new pkgbuild from opera"
 wget -O PKGBUILD http://snapshot.opera.com/unix/latest/.unsupported/PKGBUILD
 wgetres=$?
 source PKGBUILD
@@ -12,6 +13,7 @@ if [ $wgetres -eq 0 ] && [ $(vercmp "$pkgver" "$oldVer") -gt 0 ]; then
 	sed -e 's/#_opdistro/_opdistro/' -i PKGBUILD
 	git diff --no-ext-diff --quiet --exit-code PKGBUILD
 	if [ $? -ne 0 ]; then
+		msg "build new opera next version"
 		cd ${rpdir}
 		buildone '' testing/opera-next
 		[ $? -eq 0 ] && git push

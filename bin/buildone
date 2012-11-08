@@ -221,10 +221,7 @@ if [ $inrepo -eq 0 ]; then
 	# if i maintain it in aur upload
 	if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
 		# i maintain this so upload on success to aur
-		msg "upload the source to AUR"
-		makepkg --source
-		burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
-		rm -rf *.src.tar.gz src/
+		aurupload
 	fi
 fi
 

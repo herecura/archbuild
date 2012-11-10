@@ -7,9 +7,9 @@ folders=$(ls -1 ${rpdir}/testing)
 for folder in ${folders}
 do
 	msg "try to start build for $folder"
-	if [ -d ${rpdir}/${rpfolder}/${folder} ];
+	if [ -d ${rpdir}/testing/${folder} ];
 	then
-		buildone '' ${rpfolder}/${folder}
+		buildone testing/${folder}
 	fi
 done
 

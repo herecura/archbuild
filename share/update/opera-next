@@ -15,7 +15,7 @@ if [ $wgetres -eq 0 ] && [ $(vercmp "$pkgver" "$oldVer") -gt 0 ]; then
 	if [ $? -ne 0 ]; then
 		msg "build new opera next version"
 		cd ${rpdir}
-		buildone '' testing/opera-next
+		buildone testing/opera-next
 		[ $? -eq 0 ] && git push
 	fi
 else

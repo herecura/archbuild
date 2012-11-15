@@ -123,6 +123,9 @@ fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
 if [[ ${testing} -eq 0 && -e "${packagesdir}/${fullpkg}" ]]; then
 	msg "package $fullpkg already exists"
 	return 250
+elif [[ ${testing} -eq 1 && ${install_what} = "" && -e "${packagesdir}/${fullpkg}" ]]; then
+	msg "package $fullpkg already exists"
+	return 250
 else
 	buildcmd="${buildx}${buildopts}"
 	eval ${buildcmd}
@@ -171,6 +174,15 @@ if [ "$pkgbase" = "" ]; then
 fi
 fullpkg=${pkgbase}-${pkgver}-${pkgrel}
 if [ $inrepo -eq 0 ]; then
+	# test if a built testing package is the same as before
+	for _arch in ${arch[@]}; do
+		tstpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
+		if [[ ${testing} -eq 1 && -e "${packagesdir}/${tstpkg}" ]]; then
+			msg "package $tstpkg already exists"
+			mkres=250
+		fi
+	done
+
 	if [ ${mkres} -eq 0 ]; then
 		msg "package $fullpkg successfully built"
 		gpgsign
@@ -252,6 +264,7 @@ msg "cleanup possible leftovers"
 rm -rf pkg/
 rm -f *.pkg.tar.?z*
 rm -f .lock
+rm -f *.log
 
 exit ${mkres}
 

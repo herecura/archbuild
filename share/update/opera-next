@@ -2,21 +2,30 @@
 source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
-cd testing/opera-next
+git pull origin master
+
+appname=opera-next
+msg "autoupdate $appname"
+
+# cd to folder of ${appname}
+cd testing/${appname}
+
 source PKGBUILD
+msg "$appname version: $pkgver"
 oldVer=$pkgver
+
 msg "get new pkgbuild from opera"
 wget -O PKGBUILD http://snapshot.opera.com/unix/latest/.unsupported/PKGBUILD
 wgetres=$?
 source PKGBUILD
+msg "$appname new version: $pkgver"
+
 if [ $wgetres -eq 0 ] && [ $(vercmp "$pkgver" "$oldVer") -gt 0 ]; then
 	sed -e 's/#_opdistro/_opdistro/' -i PKGBUILD
 	git diff --no-ext-diff --quiet --exit-code PKGBUILD
 	if [ $? -ne 0 ]; then
-		msg "build new opera next version"
-		cd ${rpdir}
-		buildone testing/opera-next
-		[ $? -eq 0 ] && git push
+		msg "$appname :: update PKGBUILD to version $pkgver"
+		buildqueue-build testing/$appname
 	fi
 else
 	git checkout PKGBUILD

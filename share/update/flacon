@@ -1,24 +1,25 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
 git pull origin master
 
 appname=flacon
+msg "autoupdate $appname"
 
-(
 # cd to folder of ${appname}
-cd stable-any/${appname}
+cd stable/${appname}
 
 source PKGBUILD
+msg "$appname version: $pkgver"
 
 # get version from site
+msg "get new version of $appname"
 nwVersion=$(wget -q -O- http://code.google.com/p/flacon/downloads/list | grep -m1 -ie "<a.*flacon-[0-9\.]*.\.tgz.*Download" | sed 's,.*flacon-\([0-9a-z\.]*\)\.tgz.*,\1,')
+msg "$appname new version: $nwVersion"
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
-	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
+	msg "$appname :: update PKGBUILD to version $nwVersion"
 
 	cat PKGBUILD |\
 	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
@@ -30,9 +31,8 @@ else
 	mkpres=$?
 	rm -rf src
 	if [ $mkpres -eq 0 ]; then
-		buildone
+		buildqueue-build stable/$appname
 	else
 		git checkout PKGBUILD
 	fi
 fi
-)

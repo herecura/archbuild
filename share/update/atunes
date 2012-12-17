@@ -1,27 +1,27 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
 git pull origin master
 
 appname=atunes
+msg "autoupdate $appname"
 
-(
-# cd to folder of ${appname}
-cd stable-any/${appname}
+cd stable/${appname}
 
 source PKGBUILD
+msg "$appname version: $pkgver"
 
 # get version from site
-nwVersion=$(wget -q -O- http://www.atunes.org/?page_id=6 | grep -ie "<h2.*atunes" | sed 's,.*<h2>atunes\ \([0-9\.]*\)</h2>.*,\1,i')
+msg "get new version of $appname"
+nwVersion=$(wget -q -O- http://sourceforge.net/projects/atunes/ | grep -m1 -ie "<a\ href=.*\/atunes.*.tar.gz" | sed 's,.*<a href=".*title=.*atunes-\(.*\)-bin.*,\1,')
+msg "$appname new version: $nwVersion"
 
-if [ "${nwVersion}" = "${pkgver}" ]; then
-	echo "${appname} :: is already on the latest version"
-else
-	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
+if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
+	msg "$appname :: update PKGBUILD to version $nwVersion"
 
 	cat PKGBUILD |\
-	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
+	sed -e "s/^pkgver=.*/pkgver=$nwVersion/g"  \
 		-e "s/^pkgrel=.*/pkgrel=1/g" |\
 	awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
 	> PKGBUILD-updated
@@ -30,9 +30,8 @@ else
 	mkpres=$?
 	rm -rf src
 	if [ $mkpres -eq 0 ]; then
-		buildone
+		buildqueue-build stable/$appname
 	else
 		git checkout PKGBUILD
 	fi
 fi
-)

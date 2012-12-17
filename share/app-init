@@ -10,7 +10,7 @@ sharePath="$startPath/share"
 varPath="$startPath/var"
 [ ! -d "$varPath" ] && mkdir -p "$varPath"
 
-PATH=$PATH:$binPath
+PATH=$binPath:$PATH
 
 source "$sharePath/functions"
 

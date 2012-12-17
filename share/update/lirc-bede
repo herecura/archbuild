@@ -1,22 +1,25 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
 cd ${rpdir}
 git pull origin master
 
 appname=lirc-bede
+msg "autoupdate $appname"
 
-(
 # cd to folder of ${appname}
 cd stable/${appname}
 
 source PKGBUILD
+msg "$appname version: $pkgver"
 
 # get version from site
+msg "get new version of $appname"
 nwVersion=$(wget -q -O- http://sourceforge.net/projects/lirc/ | grep -m1 -ie "<a\ href=.*\/lirc.*tar\.bz2" | sed 's,.*<a href=".*title=.*lirc-\(.*\)\.tar\.bz2.*,\1,')
+msg "$appname new version: $nwVersion"
 
 if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
-	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
+	msg "$appname :: update PKGBUILD to version $nwVersion"
 
 	cat PKGBUILD |\
 	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
@@ -28,9 +31,8 @@ if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	mkpres=$?
 	rm -rf src
 	if [ $mkpres -eq 0 ]; then
-		buildone
+		buildqueue-build stable/$appname
 	else
 		git checkout PKGBUILD
 	fi
 fi
-)

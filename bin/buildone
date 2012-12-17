@@ -29,6 +29,8 @@ thisfolder=`pwd`
 if [ -e ../repository ]; then
 	source ../repository
 	inrepo=0
+else
+	keepsource=0
 fi
 
 if [ $inrepo -eq 0 ]; then
@@ -262,9 +264,11 @@ fi
 
 msg "cleanup possible leftovers"
 rm -rf pkg/
-rm -f *.pkg.tar.?z*
 rm -f .lock
-rm -f *.log
+if [ $inrepo -eq 0 ]; then
+	rm -f *.pkg.tar.?z*
+	rm -f *.log
+fi
 
 exit ${mkres}
 

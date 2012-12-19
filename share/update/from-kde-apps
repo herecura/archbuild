@@ -17,7 +17,8 @@ msg "$appname version: $pkgver"
 
 # get version from site
 msg "get new version of $appname"
-nwVersion=$(wget -q -O- http://kde-apps.org/content/show.php?content=${content} | grep -ie "<h1.*contentmainheadline.*${searchfor}</h1>" | sed 's/.*<span class=\"contentdata\">\([0-9\.a-z]*\)<\/span>.*/\1/g')
+nwVersion=$(wget -q -O- http://kde-apps.org/content/show.php?content=${content} | grep -ie "<h1.*contentmainheadline.*${searchfor}</h1>" | sed 's/.*<span class=\"contentdata\">\([0-9\.a-z\-]*\)<\/span>.*/\1/g')
+nwVersion=${nwVersion%-*}
 msg "$appname new version: $nwVersion"
 
 if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then

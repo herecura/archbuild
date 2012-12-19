@@ -1,36 +1,33 @@
 #!/bin/bash
-source $(dirname $0)/../config
+source "$(dirname $0)/../app-init"
 
-buildqueue-add \
-	"~/archbuild/update/atunes" \
-	"~/archbuild/update/colibri" \
-	"~/archbuild/update/flacon" \
-	"~/archbuild/update/hamsimanager" \
-	"~/archbuild/update/httrack" \
-	"~/archbuild/update/jalbum" \
-	"~/archbuild/update/kcm-grub2" \
-	"~/archbuild/update/kcm-qt-graphicssystem" \
-	"~/archbuild/update/kcm-wacomtablet" \
-	"~/archbuild/update/kmtail" \
-	"~/archbuild/update/knights" \
-	"~/archbuild/update/kpassgen" \
-	"~/archbuild/update/kps" \
-	"~/archbuild/update/kwooty" \
-	"~/archbuild/update/lcdproc" \
-	"~/archbuild/update/lirc-bede" \
-	"~/archbuild/update/mkclean" \
-	"~/archbuild/update/nmapsi4" \
-	"~/archbuild/update/nntpgrab" \
-	"~/archbuild/update/pdfminer" \
-	"~/archbuild/update/php-mongo" \
-	"~/archbuild/update/python2-pymongo" \
-	"~/archbuild/update/python2-yenc" \
-	"~/archbuild/update/sabnzbd" \
-	"~/archbuild/update/xmlindent" \
-	"cd ${rpdir}" \
-	"git push origin master"
+curdir="$(dirname $0)"
 
-# in community
-#	"~/archbuild/update/closure-compiler" \
-#	"~/archbuild/update/closure-linter" \
-#	"~/archbuild/update/python2-gflags" \
+
+$curdir/atunes
+$curdir/colibri
+$curdir/flacon
+$curdir/hamsimanager
+$curdir/httrack
+$curdir/jalbum
+$curdir/kcm-grub2
+$curdir/kcm-qt-graphicssystem
+$curdir/kcm-wacomtablet
+$curdir/kmtail
+$curdir/knights
+$curdir/kpassgen
+$curdir/kps
+$curdir/kwooty
+$curdir/lcdproc
+$curdir/lirc-bede
+$curdir/mkclean
+$curdir/nmapsi4
+$curdir/nntpgrab
+$curdir/pdfminer
+$curdir/php-mongo
+$curdir/python2-pymongo
+$curdir/python2-yenc
+$curdir/sabnzbd
+$curdir/vim
+$curdir/xmlindent
+

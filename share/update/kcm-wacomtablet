@@ -1,6 +1,4 @@
 #!/bin/bash
-source $(dirname $0)/../config
-
 appname=kcm-wacomtablet
 content=114856
 searchfor='wacom\ tablet'

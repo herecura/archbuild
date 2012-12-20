@@ -40,6 +40,9 @@ if [ $inrepo -eq 0 ]; then
 		*herecura*)
 			buildbase='herecura'
 			;;
+		*pre-community*)
+			buildbase='precommunity'
+			;;
 		*)
 			buildbase='extra'
 			;;

@@ -1,20 +1,25 @@
 #!/bin/bash
-source $(dirname $0)/../config-archlinux
+source "$(dirname $0)/../app-init"
+
+cd ${rpdir}
+git pull origin master
 
 appname=closure-compiler
+msg "autoupdate $appname"
 
-(
-cd "$rpdir"
-communityco "$appname"
-cd "$appname/trunk"
+# cd to folder of ${appname}
+cd pre-community/${appname}
 
 source PKGBUILD
+msg "$appname version: $pkgver"
 
 # get version from site
+msg "get new version of $appname"
 nwVersion=$(wget -q -O- http://code.google.com/p/closure-compiler/downloads/list | grep -m1 -ie "<a.*compiler-[0-9\.]*\.tar\.gz.*Download" | sed 's,.*compiler-\([0-9\.]*\)\.tar\.gz.*,\1,')
+msg "$appname new version: $nwVersion"
 
 if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
-	echo "${appname} :: update PKGBUILD to version ${nwVersion}"
+	msg "$appname :: update PKGBUILD to version $nwVersion"
 
 	cat PKGBUILD |\
 	sed -e "s/^pkgver=.*/pkgver=${nwVersion}/g"  \
@@ -25,12 +30,8 @@ if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	makepkg -g >> PKGBUILD
 	mkpres=$?
 	if [ $mkpres -eq 0 ]; then
-		buildone-archlinux
-		if [ $? -ne 0 ]; then
-			svn revert PKGBUILD
-		fi
+		buildqueue-build pre-community/$appname
 	else
-		svn revert PKGBUILD
+		git checkout PKGBUILD
 	fi
 fi
-)

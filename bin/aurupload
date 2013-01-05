@@ -6,7 +6,17 @@ if [ ! -e PKGBUILD ]; then
 	exit 1
 fi
 
+if [ -e AUR ]; then
+	category=$(cat AUR)
+elif [ ! -z $1 ]; then
+	category="$1"
+else
+	errmsg "this script needs a category for upload"
+	exit 1
+fi
+
 msg "upload the source to AUR"
 makepkg --source
-burp -c $(cat AUR) $(ls -1 *.src.tar.gz)
+burp -c $category $(ls -1 *.src.tar.gz)
 rm -rf *.src.tar.gz src/
+msg "done"

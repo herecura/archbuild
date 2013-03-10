@@ -1,4 +1,0 @@
-#!/bin/bash
-source $(dirname $0)/buildqueue.conf
-
-tail -f -n 30 ~/log/buildqueue.log

@@ -1,0 +1,92 @@
+source "$etcPath/config"
+
+# check for messages being printed in color
+unset ALL_OFF BOLD BLUE GREEN RED YELLOW
+if [[ -t 2 ]]; then
+	ALL_OFF="\e[1;0m"
+	BOLD="\e[1;1m"
+	GREEN="${BOLD}\e[1;32m"
+	RED="${BOLD}\e[1;31m"
+	YELLOW="$BOLD\e[1;33m"
+	BLUE="$BOLD\e[1;34m"
+fi
+readonly ALL_OFF BOLD GREEN RED YELLOW BLUE
+
+plain() {
+	local mesg=$1; shift
+	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&2
+}
+
+function msg() {
+	local mesg=$1; shift;
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" >&2;
+	log "==> $mesg"
+}
+
+function msg2() {
+	local mesg=$1; shift;
+	printf "${BLUE} ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" >&2;
+	log " -> $mesg"
+}
+
+function errmsg() {
+	local mesg=$1; shift;
+	printf "${RED}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" >&2;
+	log "=E> $mesg"
+}
+
+function msgExec() {
+	local mesg=$1; shift;
+	printf "${BLUE} ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}" >&2;
+	log " -> $mesg"
+}
+
+function success() {
+	printf " ${GREEN}SUCCESS${ALL_OFF}\n" >&2;
+	return 0;
+}
+
+function error() {
+	printf " ${RED}ERROR${ALL_OFF}\n" >&2;
+	return 1;
+}
+
+function warning() {
+	printf " ${YELLOW}WARNING${ALL_OFF}\n" >&2;
+	return 0;
+}
+
+stat_busy() {
+	local mesg=$1; shift
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
+	log "==> $mesg..."
+}
+
+stat_done() {
+	printf "${BOLD}done${ALL_OFF}\n" >&2
+	log "done"
+}
+
+function log() {
+	if [ "$logfile" != "" ]
+	then
+		[ ! -d "$(dirname $logfile)" ] && mkdir -p "$(dirname $logfile)"
+		if [ $# -gt 0 ]; then
+			echo "[$(date +%Y-%m-%d\ %H:%M:%S)] $@" >> $logfile
+		else
+			while read data
+			do
+				echo "[$(date +%Y-%m-%d\ %H:%M:%S)] $data" >> $logfile
+			done
+		fi
+	fi
+}
+
+# logfile must be defined !!
+if [ "$logfile" == "" ]
+then
+	errmsg "logfile configuration option must be defined"
+	exit 1
+fi
+
+# vim:set ft=sh:

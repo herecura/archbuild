@@ -1,0 +1,10 @@
+#!/bin/bash
+source "$(dirname $0)/../app-init"
+
+curdir="$(dirname $0)"
+
+
+$curdir/closure-compiler
+$curdir/closure-linter
+$curdir/python2-gflags
+

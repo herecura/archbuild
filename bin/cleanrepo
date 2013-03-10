@@ -1,0 +1,51 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [ -e repository ]; then
+	source repository
+else
+	errmsg "You must run this script inside a repository"
+	exit 1
+fi
+
+returndir=`pwd`
+
+packtemp=$(ls -1)
+
+[ -e ${pkgrepo}/${repository}.txt ] && rm -f ${pkgrepo}/${repository}.txt
+
+for package in ${packtemp}
+do
+	if [ -d ${package} ]
+	then
+		echo ${package}.* >> ${pkgrepo}/${repository}.txt
+	fi
+done
+
+function cleanRepo() {
+	if [ "$1" = "" ]; then
+		errmsg "no architecture given"
+		return 1
+	fi
+	packagesdir=${pkgrepo}/${repository/-any/}/${1}
+	msg "clean ${repository} for ${1}"
+	cd ${packagesdir}
+	msg2 "following packages will be dropped:"
+	ls -1 *.pkg.tar.* | grep -xv "$(cat ${pkgrepo}/${repository}.txt)"
+	msgExec "dropping packages"
+	rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${pkgrepo}/${repository}.txt)") > /dev/null 2>&1 && success || error
+}
+
+if [ "${rarch}" = "any" ]; then
+	cleanRepo any
+else
+	for _arch in ${rarch}; do
+		cleanRepo ${_arch}
+	done
+fi
+
+rm -f ${pkgrepo}/${repository}.txt
+
+cd ${returndir}
+
+regenrepo clean

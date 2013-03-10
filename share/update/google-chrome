@@ -1,0 +1,21 @@
+#!/bin/bash
+source "$(dirname $0)/../app-init"
+
+cd ${rpdir}
+git pull origin master
+
+appname=google-chrome
+msg "autoupdate $appname"
+
+# cd to folder of ${appname}
+cd stable/
+wget -q http://aur.archlinux.org/packages/go/google-chrome/google-chrome.tar.gz
+tar -zxf google-chrome.tar.gz
+rm -f google-chrome.tar.gz
+
+if ! git diff --no-ext-diff --quiet --exit-code google-chrome; then
+	cd google-chrome
+	source PKGBUILD
+	msg "$appname :: update PKGBUILD to version $pkgver"
+	buildqueue-build stable/$appname
+fi

@@ -1,0 +1,121 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+# Avoid any encoding problems
+export LANG=C
+
+cleanup() {
+	trap - EXIT INT QUIT TERM HUP
+	[[ $1 ]] && exit $1
+}
+
+abort() {
+	errmsg 'Aborting build ...'
+	cleanup 255
+}
+
+trap_abort() {
+	abort
+}
+
+trap_exit() {
+	cleanup 0
+}
+
+die() {
+	errmsg "$*"
+	cleanup 255
+}
+
+trap 'trap_abort' INT QUIT TERM HUP
+trap 'trap_exit' EXIT
+
+base_packages=(base base-devel sudo)
+
+cmd="${0##*/}"
+if [[ "${cmd%%-*}" == 'multilib' ]]; then
+	repo="${cmd%-build}"
+	arch='x86_64'
+	base_packages+=(multilib-devel)
+else
+	tag="${cmd%-build}"
+	repo=${tag%-*}
+	arch=${tag##*-}
+fi
+makechrootpkg_args=''
+clean_first=false
+
+usage() {
+	echo "usage $cmd"
+	echo '    -c         Recreate the chroot before building'
+	exit 1
+}
+
+while getopts 'ch' arg; do
+	case "${arg}" in
+		c) clean_first=true ;;
+		*) usage ;;
+	esac
+done
+
+# Pass all arguments after -- into makechrootpkg
+makechrootpkg_args="$makechrootpkg_args ${*:$OPTIND}"
+
+if [[ "$EUID" != '0' ]]; then
+	die 'This script must be run as root.'
+fi
+
+if [ -e "$etcPath/conf/pacman-$repo.conf" ]; then
+	pacmanConf="$etcPath/conf/pacman-$repo.conf"
+elif [ -e "/usr/share/devtools/pacman-${repo}.conf" ]; then
+	pacmanConf="/usr/share/devtools/pacman-${repo}.conf"
+else
+	die "pacman configuration for this $repo not found"
+fi
+
+if [ -e "$etcPath/conf/makepkg-$arch.conf" ]; then
+	makepkgConf="$etcPath/conf/makepkg-$arch.conf"
+elif [ -e "/usr/share/devtools/makepkg-${arch}.conf" ]; then
+	makepkgConf="/usr/share/devtools/makepkg-${arch}.conf"
+else
+	die "makepkg configuration for this $arch not found"
+fi
+
+if ${clean_first} || [[ ! -d "${chroots}/${repo}-${arch}" ]]; then
+	msg "Creating chroot for [${repo}] (${arch})..."
+
+	for copy in "${chroots}/${repo}-${arch}"/*; do
+		[[ -d $copy ]] || continue
+		msg2 "Deleting chroot copy '$(basename "${copy}")'..."
+
+		exec 9>"$copydir.lock"
+		if ! flock -n 9; then
+			stat_busy "Locking chroot copy '$copy'"
+			flock 9
+			stat_done
+		fi
+
+		{ type -P btrfs && btrfs subvolume delete "${copy}"; } &>/dev/null
+		rm -rf --one-file-system "${copy}"
+	done
+	exec 9>&-
+
+	rm -rf --one-file-system "${chroots}/${repo}-${arch}"
+	mkdir -p "${chroots}/${repo}-${arch}"
+	setarch "${arch}" mkarchroot-ike \
+		-C "$pacmanConf" \
+		-M "$makepkgConf" \
+		"${chroots}/${repo}-${arch}/root" \
+		"${base_packages[@]}" || abort
+else
+	setarch ${arch} mkarchroot-ike \
+		-u \
+		-C "$pacmanConf" \
+		-M "$makepkgConf" \
+		"${chroots}/${repo}-${arch}/root" || abort
+fi
+
+msg "Building in chroot for [${repo}] (${arch})..."
+# default archlinux is also -c -n 
+exec setarch "${arch}" makechrootpkg-ike -r "${chroots}/${repo}-${arch}" $makechrootpkg_args
+cleanup $?

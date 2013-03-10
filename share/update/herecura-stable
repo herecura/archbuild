@@ -1,0 +1,33 @@
+#!/bin/bash
+source "$(dirname $0)/../app-init"
+
+curdir="$(dirname $0)"
+
+
+$curdir/atunes
+$curdir/colibri
+$curdir/flacon
+$curdir/google-chrome
+$curdir/hamsimanager
+$curdir/httrack
+$curdir/jalbum
+$curdir/kcm-grub2
+$curdir/kcm-qt-graphicssystem
+$curdir/kcm-wacomtablet
+$curdir/kmtail
+$curdir/knights
+$curdir/kpassgen
+$curdir/kwooty
+$curdir/lcdproc
+$curdir/mkclean
+$curdir/mysql-workbench
+$curdir/nmapsi4
+$curdir/nntpgrab
+$curdir/pdfminer
+$curdir/php-mongo
+$curdir/python2-pymongo
+$curdir/python2-yenc
+$curdir/sabnzbd
+$curdir/vim
+$curdir/xmlindent
+

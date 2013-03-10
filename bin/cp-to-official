@@ -1,0 +1,46 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [ ! -e PKGBUILD ]; then
+	errmsg "this script must be run with a directory containing a PKGBUILD"
+	exit 1
+fi
+
+if [ ! -e $precommunity/repository ]; then
+	errmsg "you must have a pre-community repository"
+	exit 1
+fi
+source $precommunity/repository
+
+source PKGBUILD
+if [ "$pkgbase" = "" ]; then
+	pkgbase=$pkgname
+fi
+
+msg "$pkgbase"
+
+old_pkgver=$pkgver
+old_pkgrel=$pkgrel
+
+msg2 "version: $old_pkgver-$old_pkgrel"
+
+if [ ! -e $precommunity/$pkgbase/PKGBUILD ]; then
+	errmsg "the PKGBUILD must exist in the pre-community repo"
+	exit 1
+fi
+source $precommunity/$pkgbase/PKGBUILD
+
+msg2 "     to: $pkgver-$pkgrel"
+
+if [ $(vercmp "$pkgver-$pkgrel" "$old_pkgver-$old_pkgrel") -gt 0 ]; then
+	msg "update official repo"
+	( cd $precommunity/$pkgbase/; makepkg --source; rm -rf src/ )
+	mv $precommunity/$pkgbase/$pkgbase-$pkgver-$pkgrel.src.tar.gz ./
+	tar --strip-components=1 -xf $pkgbase-$pkgver-$pkgrel.src.tar.gz
+	rm -f $pkgbase-$pkgver-$pkgrel.src.tar.gz
+	for splitpkg in ${pkgname[@]}; do
+		for _arch in ${arch[@]}; do
+			cp $pkgrepo/$repository/pool/$splitpkg-$pkgver-$pkgrel-$_arch.pkg.tar.?z* ./
+		done
+	done
+fi

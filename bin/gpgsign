@@ -1,0 +1,13 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+msg "Gpg sign all packages found in $(pwd)"
+
+if [ "$gpgkeyf" != "" ]; then
+	for pkgfile in $(find -name "*.pkg.tar.?z"); do
+		msgExec "signing ${pkgfile/\.\//}"
+		echo "$gpgpass" | gpg --homedir ~/.gnupg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign $pkgfile 2>> $logfile && success || error
+	done
+fi
+
+msg "done"

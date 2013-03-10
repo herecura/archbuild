@@ -1,0 +1,36 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+# create queue dir when it does not exist
+[ ! -d $queuedir ] && mkdir ${queuedir}
+
+function runQueueItem {
+	currentQueue=$(date +%Y%m%d\ %H%M%S)
+	(
+		echo " "
+		echo "------------------------------------------------------------"
+		echo "running queueitem ${currentQueue}"
+		echo "------------------------------------------------------------"
+		source ${queuedir}/${1}
+		rm -f ${queuedir}/${1}
+		echo "------------------------------------------------------------"
+		echo "done queueitem ${currentQueue}"
+		echo "------------------------------------------------------------"
+		echo " "
+	) >> "$queuelog" 2>&1
+}
+
+function buildQueue {
+	while true; do
+		if [ $(ls -1tr ${queuedir} | wc -l) -gt 0 ]
+		then
+			for file in $(ls -1tr ${queuedir})
+			do
+				runQueueItem ${file}
+			done
+		fi
+		sleep 5
+	done
+}
+
+buildQueue &

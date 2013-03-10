@@ -1,0 +1,18 @@
+#!/bin/bash
+source "$(dirname $0)/../app-init"
+
+cd ${rpdir}
+
+folders=$(ls -1 ${rpdir}/testing)
+for folder in ${folders}
+do
+	msg "try to start build for $folder"
+	if [ -d ${rpdir}/testing/${folder} ];
+	then
+		buildone testing/${folder}
+	fi
+done
+
+cd ${rpdir}
+git push origin master
+git reset --hard

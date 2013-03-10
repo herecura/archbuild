@@ -1,5 +1,0 @@
-#!/bin/bash
-appname=kps
-content=110732
-searchfor='KPS'
-$(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

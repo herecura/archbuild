@@ -1,6 +1,0 @@
-#!/bin/bash
-source $(dirname $0)/buildqueue.conf
-
-cd ~/log
-mv buildqueue.log buildqueue-$(date +%Y%m%d).log
-find -type f -mtime +4 -delete

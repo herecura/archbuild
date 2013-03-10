@@ -1,0 +1,6 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+msg "view buildqueue log"
+$EDITOR "$queuelog"
+stat_done

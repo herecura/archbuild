@@ -1,7 +1,0 @@
-#!/bin/bash
-source $(dirname $0)/../config
-
-buildqueue-add \
-	"~/archbuild/up-arch/closure-compiler" \
-	"~/archbuild/up-arch/closure-linter" \
-	"~/archbuild/up-arch/python2-gflags" \

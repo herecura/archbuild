@@ -1,0 +1,35 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+msg "regenerate repository"
+
+if [ -e repository ]; then
+	source repository
+else
+	errmsg "You must run this script inside a repository"
+	exit 1
+fi
+
+function regenRepo() {
+	if [ "$1" = "" ]; then
+		errmsg "no architecture given"
+		return 1
+	fi
+	msg "regenerate ${repository} for ${1}"
+	packagesdir=${pkgrepo}/${repository/-any/}/${1}
+	cd ${packagesdir}
+	if [ "$2" = "clean" ]; then
+		msgExec "remove db"
+		rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
+	fi
+	msgExec "run repo-add"
+	repo-add ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+}
+
+if [ "${rarch}" = "any" ]; then
+	regenRepo any $1
+else
+	for _arch in ${rarch}; do
+		regenRepo ${_arch} $1
+	done
+fi

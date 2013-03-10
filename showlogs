@@ -1,5 +1,0 @@
-#!/bin/bash
-source $(dirname $0)/config
-
-cd ${rpdir}
-find -maxdepth 3 -name "*.log" | sort | sed 's/\.\///g' 

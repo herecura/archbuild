@@ -121,11 +121,15 @@ else
 	_arch=$1
 	buildx="sudo $buildbase-$_arch-build"
 fi
+keepversion=$2
 buildopts=" -- -l archbuild -c${install_before}"
 if [ ${keepsource} -eq 1 ]; then
 	buildopts="${buildopts} -- --log"
 else
 	buildopts="${buildopts} -- -c --log"
+fi
+if [ ${keepversion} -eq 0 ]; then
+	buildopts="${buildopts} --holdver"
 fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
 if [[ ${testing} -eq 0 && -e "${packagesdir}/${fullpkg}" ]]; then
@@ -162,11 +166,13 @@ return 254
 }
 
 mkres=0
+firstone=1
 source PKGBUILD
 msg "run makepkg for ${pkgname}"
 for _arch in ${arch[@]}; do
 	msg2 ${_arch}
-	buildInChroot ${_arch}
+	buildInChroot ${_arch} $firstone
+	firstone=0
 	result=$?
 	if [[ $mkres -eq 0 && $result -ne 0 ]]; then
 		mkres=$result

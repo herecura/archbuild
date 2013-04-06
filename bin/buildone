@@ -275,6 +275,7 @@ if [ "${mailto}" != "" ]; then
 fi
 
 msg "cleanup possible leftovers"
+rm -rf src/
 rm -rf pkg/
 rm -f .lock
 if [ $inrepo -eq 0 ]; then

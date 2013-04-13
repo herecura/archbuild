@@ -172,8 +172,8 @@ msg "run makepkg for ${pkgname}"
 for _arch in ${arch[@]}; do
 	msg2 ${_arch}
 	buildInChroot ${_arch} $firstone
-	firstone=0
 	result=$?
+	firstone=0
 	if [[ $mkres -eq 0 && $result -ne 0 ]]; then
 		mkres=$result
 	fi

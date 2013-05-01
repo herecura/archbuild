@@ -1,0 +1,35 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [ -e repository ]; then
+	source repository
+else
+	errmsg "You must run this script inside a repository"
+	exit 1
+fi
+
+returndir=`pwd`
+
+msg "clean ${repository} pool"
+msg2 "building packages list"
+packages=()
+for pkgbuild in $(find -mindepth 2 -maxdepth 2 -name "PKGBUILD"); do
+	source $pkgbuild
+	packages+=(${pkgname[@]})
+	unset pkgname
+done
+
+cd ${pkgrepo}/${repository}/pool
+
+msg2 "list packages to keep"
+for package in ${packages[@]}; do
+	ls -1tr $package-[0-9]* | tail -n 8
+done > "$varPath/cleanrepo.keep.tmp.txt"
+
+msgExec "remove old packages"
+rm -f $(ls -1 * | grep -xv "$(cat "$varPath/cleanrepo.keep.tmp.txt")") > /dev/null 2>&1 && success || error
+
+msg2 "remove temporary files"
+rm -f "$varPath/cleanrepo.keep.tmp.txt"
+
+#ls -1 xbmc-git* | sort | grep -v "$(ls xbmc-git* | sort | tail -n 8)"

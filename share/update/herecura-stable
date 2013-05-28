@@ -22,7 +22,6 @@ $curdir/lcdproc
 $curdir/mkclean
 $curdir/mysql-workbench
 $curdir/nmapsi4
-$curdir/nntpgrab
 $curdir/pdfminer
 $curdir/php-mongo
 $curdir/python2-pymongo

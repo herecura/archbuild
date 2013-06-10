@@ -8,7 +8,7 @@ appname=lcdproc
 msg "autoupdate $appname"
 
 # cd to folder of ${appname}
-cd stable/${appname}
+cd pre-community/${appname}
 
 source PKGBUILD
 msg "$appname version: $pkgver"
@@ -31,7 +31,7 @@ if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then
 	mkpres=$?
 	rm -rf src
 	if [ $mkpres -eq 0 ]; then
-		buildqueue-build stable/$appname
+		buildqueue-build pre-community/$appname
 	else
 		git checkout PKGBUILD
 	fi

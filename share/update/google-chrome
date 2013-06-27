@@ -15,6 +15,8 @@ rm -f google-chrome.tar.gz
 
 if ! git diff --no-ext-diff --quiet --exit-code google-chrome; then
 	cd google-chrome
+	# stay the fuck away from PKGEXT !
+	sed -e '/PKGEXT/d' -i PKGBUILD
 	source PKGBUILD
 	msg "$appname :: update PKGBUILD to version $pkgver"
 	buildqueue-build stable/$appname

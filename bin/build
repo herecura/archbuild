@@ -30,7 +30,7 @@ die() {
 trap 'trap_abort' INT QUIT TERM HUP
 trap 'trap_exit' EXIT
 
-base_packages=(base base-devel sudo)
+base_packages=(base-devel)
 
 cmd="${0##*/}"
 if [[ "${cmd%%-*}" == 'multilib' ]]; then

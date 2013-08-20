@@ -7,7 +7,6 @@ curdir="$(dirname $0)"
 $curdir/atunes
 $curdir/colibri
 $curdir/flacon
-$curdir/google-chrome
 $curdir/hamsimanager
 $curdir/httrack
 $curdir/jalbum

@@ -15,7 +15,7 @@ msg "$appname version: $pkgver"
 
 # get version from site
 msg "get new version of $appname"
-nwVersion=$(wget -q -O- http://www.mysql.com/downloads/workbench/ | grep -m1 -ie "<h1.*MySQL Workbench [0-9\.]*" | sed 's,.*MySQL Workbench \([0-9\.]*\)</h1.*,\1,')
+nwVersion=$(wget -q -O- http://www.mysql.com/downloads/workbench/ | grep -m1 -ie "<h1.*MySQL Workbench [0-9\.]*" | sed 's,.*MySQL Workbench \([0-9\.]*\).*</h1.*,\1,')
 msg "$appname new version: $nwVersion"
 
 if [ $(vercmp "$nwVersion" "$pkgver") -gt 0 ]; then

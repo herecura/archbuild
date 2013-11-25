@@ -9,7 +9,7 @@ do
 	if [ -d ${rpdir}/testing/${folder} ]; then
 		(
 			cd ${rpdir}/testing/${folder}
-			pkgupdate dry-run
+			pkgupdate
 		)
 	fi
 done

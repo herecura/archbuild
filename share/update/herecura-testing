@@ -6,13 +6,11 @@ cd ${rpdir}
 folders=$(ls -1 ${rpdir}/testing)
 for folder in ${folders}
 do
-	msg "try to start build for $folder"
-	if [ -d ${rpdir}/testing/${folder} ];
-	then
-		buildone testing/${folder}
+	if [ -d ${rpdir}/testing/${folder} ]; then
+		(
+			cd ${rpdir}/testing/${folder}
+			pkgupdate dry-run
+		)
 	fi
 done
 
-cd ${rpdir}
-git push origin master
-git reset --hard

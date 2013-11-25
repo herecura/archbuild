@@ -41,6 +41,11 @@ fi
 # Use PKGBUILD directory if PKGDEST or SRCDEST don't exist
 [[ -d $SRCDEST ]] || SRCDEST=.
 
+if git symbolic-ref HEAD > /dev/null 2>&1; then
+	msg "go back to commited version"
+	git checkout .
+fi
+
 msg "load PKGBUILD"
 source PKGBUILD
 
@@ -51,6 +56,8 @@ fi
 msg "$pkgbase version: $pkgver"
 
 source .pkgupdate
+
+msg "$pkgbase new version: $update_pkgver"
 
 if [ "$update_pkgver" = "" ]; then
 	msg "$pkgbase no new version found"

@@ -1,0 +1,85 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+set -e
+
+msg "Update package in the current directory"
+
+if [ ! -e PKGBUILD ] || [ ! -e .pkgupdate ]; then
+	errmsg "this script must be run in a directory containing:"
+	errmsg "a PKGBUILD file and a .pkgupdate file"
+	exit 1
+fi
+
+# dryrun
+dryrun=0
+if [ ! -z "$1" ]; then
+	if [ "$1" = "dry-run" ]; then
+		dryrun=1
+	fi
+fi
+
+# default checksumupdate
+checksumupdate=1
+
+# check if in git tree
+if git symbolic-ref HEAD > /dev/null 2>&1; then
+	# update to latest
+	( cd ${rpdir} && git pull origin master )
+fi
+
+# Read .makepkg.conf
+makepkg_conf="$HOME/.makepkg.conf"
+
+# Get SRC/PKGDEST from makepkg.conf
+if [[ -f $makepkg_conf ]]; then
+	eval $(grep '^SRCDEST=' "$makepkg_conf")
+fi
+
+[[ -z $SRCDEST ]] && eval $(grep '^SRCDEST=' /etc/makepkg.conf)
+
+# Use PKGBUILD directory if PKGDEST or SRCDEST don't exist
+[[ -d $SRCDEST ]] || SRCDEST=.
+
+msg "load PKGBUILD"
+source PKGBUILD
+
+if [ "$pkgbase" = "" ]; then
+	pkgbase=$pkgname
+fi
+
+msg "$pkgbase version: $pkgver"
+
+source .pkgupdate
+
+if [ "$update_pkgver" = "" ]; then
+	msg "$pkgbase no new version found"
+else
+	if [ $(vercmp "$update_pkgver" "$pkgver") -gt 0 ]; then
+		msg "$pkgbase :: update PKGBUILD to version $update_pkgver"
+
+		if [ $dryrun -eq 0 ]; then
+			cp PKGBUILD PKGBUILD-updated
+			for updvar in ${!update_*}; do
+				sed \
+					-e "s/^${updvar#update_}=.*/${updvar#update_}=$(eval echo \$$updvar)/" \
+					-i PKGBUILD-updated
+			done
+			# clean checksums
+			cat PKGBUILD-updated |\
+				awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
+				> PKGBUILD
+			# remove PKGBUILD used for updating
+			rm PKGBUILD-updated
+			# generate checksums
+			if [ $checksumupdate -eq 1 ]; then
+				makepkg -g >> PKGBUILD
+				rm -rf src
+			fi
+			# start build
+			buildqueue-build $PWD
+		fi
+	else
+		msg "$pkgbase new version is the same as the previous version"
+	fi
+fi

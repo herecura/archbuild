@@ -72,10 +72,14 @@ else
 					-e "s/^${updvar#update_}=.*/${updvar#update_}=$(eval echo \$$updvar)/" \
 					-i PKGBUILD-updated
 			done
-			# clean checksums
-			cat PKGBUILD-updated |\
-				awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
-				> PKGBUILD
+			if [ $checksumupdate -eq 1 ]; then
+				# clean checksums
+				cat PKGBUILD-updated |\
+					awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
+					> PKGBUILD
+			else
+				cp PKGBUILD-updated PKGBUILD
+			fi
 			# remove PKGBUILD used for updating
 			rm PKGBUILD-updated
 			# generate checksums

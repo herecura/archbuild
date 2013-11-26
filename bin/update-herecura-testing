@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/../app-init"
+source "$(dirname $0)/../share/app-init"
 
 cd ${rpdir}
 

@@ -72,6 +72,9 @@ else
 					-e "s/^${updvar#update_}=.*/${updvar#update_}=$(eval echo \$$updvar)/" \
 					-i PKGBUILD-updated
 			done
+			if [ -z $update_pkgrel ]; then
+				sed -e "s/^pkgrel=.*/pkgrel=1/"
+			fi
 			if [ $checksumupdate -eq 1 ]; then
 				# clean checksums
 				cat PKGBUILD-updated |\

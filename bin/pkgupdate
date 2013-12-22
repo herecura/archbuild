@@ -73,7 +73,7 @@ else
 					-i PKGBUILD-updated
 			done
 			if [ -z $update_pkgrel ]; then
-				sed -e "s/^pkgrel=.*/pkgrel=1/"
+				sed -e "s/^pkgrel=.*/pkgrel=1/" -i PKGBUILD-updated
 			fi
 			if [ $checksumupdate -eq 1 ]; then
 				# clean checksums

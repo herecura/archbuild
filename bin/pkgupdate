@@ -12,10 +12,10 @@ if [ ! -e PKGBUILD ] || [ ! -e .pkgupdate ]; then
 fi
 
 # dryrun
-dryrun=0
+dryrun=1
 if [ ! -z "$1" ]; then
-	if [ "$1" = "dry-run" ]; then
-		dryrun=1
+	if [ "$1" = "run" ]; then
+		dryrun=0
 	fi
 fi
 

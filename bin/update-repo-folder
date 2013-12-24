@@ -1,0 +1,33 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [ ! -z $1 ]; then
+	repofolder="$1"
+else
+	errmsg "folder of the repo is required"
+	exit 1
+fi
+
+if [ ! -z $2 ]; then
+	if [ "$2" = "run" ]; then
+		run="$2"
+	else
+		run=''
+	fi
+else
+	run=''
+fi
+
+cd "${rpdir}"
+
+folders=$(ls -1 "${rpdir}/$repofolder")
+for folder in ${folders}
+do
+	if [ -d "${rpdir}/$repofolder/${folder}" ]; then
+		(
+			cd "${rpdir}/$repofolder/${folder}"
+			pkgupdate $run
+		)
+	fi
+done
+

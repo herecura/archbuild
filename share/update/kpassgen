@@ -1,5 +1,0 @@
-#!/bin/bash
-appname=kpassgen
-content=108673
-searchfor='KPassGen'
-$(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

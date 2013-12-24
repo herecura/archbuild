@@ -1,5 +1,0 @@
-#!/bin/bash
-appname=knights
-content=122046
-searchfor='Knights'
-$(dirname $0)/from-kde-apps ${appname} ${content} "${searchfor}"

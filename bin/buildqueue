@@ -1,0 +1,107 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+# create queue dir when it does not exist
+[[ ! -d $queuedir ]] && mkdir ${queuedir}
+
+# create daemon control path
+[[ ! -d $dcontroldir ]] && mkdir ${dcontroldir}
+
+function runQueueItem {
+	currentQueue=$(date +%Y%m%d\ %H%M%S)
+	echo " "
+	echo "------------------------------------------------------------"
+	echo "running queueitem ${currentQueue}"
+	echo "------------------------------------------------------------"
+	source ${queuedir}/${1}
+	rm -f ${queuedir}/${1}
+	echo "------------------------------------------------------------"
+	echo "done queueitem ${currentQueue}"
+	echo "------------------------------------------------------------"
+	echo " "
+}
+
+function buildQueue {
+	(
+		# queue is running
+		touch "$dcontroldir/.isrunning"
+
+		run=true
+
+		while $run; do
+			if [[ $(ls -1tr ${queuedir} | wc -l) -gt 0 ]]; then
+				for file in $(ls -1tr ${queuedir})
+				do
+					runQueueItem ${file}
+				done
+			fi
+
+			sleep 5
+
+			daemonControl
+			if [[ $? -eq 1 ]]; then
+				run=false
+			fi
+		done
+
+		# cleanup dcontroldir
+		rm -f "$dcontroldir/.isrunning" > /dev/null 2>&1
+		rm -f "$dcontroldir/.stoprunning" > /dev/null 2>&1
+	) | tee -a "$queuelog"
+}
+
+function daemonControl() {
+	if [[ -e "$dcontroldir/.stoprunning" ]]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+# usage
+function usage() {
+	echo "use: $(basename $0) [options]"
+	echo "  -s  start process"
+	echo "  -d  run as daemon (option for start)"
+	echo "  -q  stop process"
+	echo "  -h  show this help"
+	exit 0
+}
+
+# default values fro run
+daemon=0
+start=0
+stop=0
+help=1
+
+# process options
+while getopts ":dsqh" arg; do
+	case "$arg" in
+		d) daemon=1 ;;
+		s) start=1; help=0 ;;
+		q) stop=1; help=0 ;;
+		h) help=1 ;;
+	esac
+done
+
+if [[ $help -eq 1 ]]; then
+	usage
+else
+	if [[ $start -eq 1 ]]; then
+		if [[ -e "$dcontroldir/.isrunning" ]]; then
+			echo "The $(basename $0) daemon is already runnig";
+		else
+			if [[ $daemon -eq 1 ]]; then
+				buildQueue &
+			else
+				buildQueue
+			fi
+		fi
+	elif [[ $stop -eq 1 ]]; then
+		if [[ -e "$dcontroldir/.isrunning" ]]; then
+			touch "$dcontroldir/.stoprunning"
+		else
+			echo "The $(basename $0) daemon is not running"
+		fi
+	fi
+fi

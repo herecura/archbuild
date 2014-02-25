@@ -9,45 +9,45 @@ source "$(dirname $0)/../share/app-init"
 
 function runQueueItem {
 	currentQueue=$(date +%Y%m%d\ %H%M%S)
-	echo " "
-	echo "------------------------------------------------------------"
-	echo "running queueitem ${currentQueue}"
-	echo "------------------------------------------------------------"
-	source ${queuedir}/${1}
-	rm -f ${queuedir}/${1}
-	echo "------------------------------------------------------------"
-	echo "done queueitem ${currentQueue}"
-	echo "------------------------------------------------------------"
-	echo " "
+	(
+		echo " "
+		echo "------------------------------------------------------------"
+		echo "running queueitem ${currentQueue}"
+		echo "------------------------------------------------------------"
+		source ${queuedir}/${1}
+		rm -f ${queuedir}/${1}
+		echo "------------------------------------------------------------"
+		echo "done queueitem ${currentQueue}"
+		echo "------------------------------------------------------------"
+		echo " "
+	) >> "$queuelog" 2>&1
 }
 
 function buildQueue {
-	(
-		# queue is running
-		touch "$dcontroldir/.isrunning"
+	# queue is running
+	touch "$dcontroldir/.isrunning"
 
-		run=true
+	run=true
 
-		while $run; do
-			if [[ $(ls -1tr ${queuedir} | wc -l) -gt 0 ]]; then
-				for file in $(ls -1tr ${queuedir})
-				do
-					runQueueItem ${file}
-				done
-			fi
+	while $run; do
+		if [[ $(ls -1tr ${queuedir} | wc -l) -gt 0 ]]; then
+			for file in $(ls -1tr ${queuedir})
+			do
+				runQueueItem ${file}
+			done
+		fi
 
-			sleep 5
+		sleep 5
 
-			daemonControl
-			if [[ $? -eq 1 ]]; then
-				run=false
-			fi
-		done
+		daemonControl
+		if [[ $? -eq 1 ]]; then
+			run=false
+		fi
+	done
 
-		# cleanup dcontroldir
-		rm -f "$dcontroldir/.isrunning" > /dev/null 2>&1
-		rm -f "$dcontroldir/.stoprunning" > /dev/null 2>&1
-	) | tee -a "$queuelog"
+	# cleanup dcontroldir
+	rm -f "$dcontroldir/.isrunning" > /dev/null 2>&1
+	rm -f "$dcontroldir/.stoprunning" > /dev/null 2>&1
 }
 
 function daemonControl() {

@@ -204,7 +204,11 @@ if [ "${mailto}" != "" ]; then
 	date=$(date +%Y-%m-%d\ %H:%M:%S)
 	if [ ${mkres} -eq 0 ]; then
 		# package success
-		echo "SUCCESS build" | mail -s "archbuild $fullpkg success ${date}" ${mailto}
+		logfiles=""
+		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
+			logfiles="$logfiles -a $logfile"
+		done
+		echo "SUCCESS build" | mail -s "archbuild $fullpkg success ${date}"$logfiles ${mailto}
 	elif [ ${mkres} -eq 250 ]; then
 		# package exists
 		echo "no mail for exists"

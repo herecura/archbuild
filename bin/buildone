@@ -68,13 +68,8 @@ else
 fi
 keepversion=$2
 buildopts=" -- -l archbuild"
-if [ ${keepsource} -eq 1 ]; then
-	buildopts="${buildopts} -- --log"
-else
-	buildopts="${buildopts} -- -c --log"
-fi
-if [ ${keepversion} -eq 0 ]; then
-	buildopts="${buildopts} --holdver"
+if [ ${keepsource} -ne 1 ]; then
+	buildopts="${buildopts} -- -c"
 fi
 fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
 if [[ ${testing} -eq 0 && -e "${packagesdir}/${fullpkg}" ]]; then

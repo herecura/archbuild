@@ -67,7 +67,7 @@ else
 	buildx="sudo $buildbase-$_arch-build"
 fi
 keepversion=$2
-buildopts=" -- -l archbuild -c"
+buildopts=" -- -l archbuild"
 if [ ${keepsource} -eq 1 ]; then
 	buildopts="${buildopts} -- --log"
 else

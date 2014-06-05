@@ -16,7 +16,7 @@ else
 fi
 
 msg "upload the source to AUR"
-makepkg --source
+mkaurball
 burp -c $category $(ls -1 *.src.tar.gz)
 rm -rf *.src.tar.gz src/
 msg "done"

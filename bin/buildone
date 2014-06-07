@@ -179,7 +179,7 @@ if [ $inrepo -eq 0 ]; then
 	# on success build commit into git tree
 	if [ ${mkres} -eq 0 ]; then
 		msg "commit sucessfull package"
-		git add .
+		git add -A .
 		finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"
 		if [ "$commitmsg" != "" ]; then
 			finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"

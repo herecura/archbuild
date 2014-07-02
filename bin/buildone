@@ -144,7 +144,7 @@ if [ $inrepo -eq 0 ]; then
 		msg "package $fullpkg successfully built"
 		gpgsign
 		msg "move packages into package pool"
-		mv *.pkg.tar.?z *.pkg.tar.?z.sig ${packagesdir}
+		mv *.pkg.tar.xz *.pkg.tar.xz.sig ${packagesdir}
 
 		for _arch in ${rarch[@]}; do
 			archpkgdir=${pkgrepo}/${repository}/${_arch}
@@ -152,20 +152,24 @@ if [ $inrepo -eq 0 ]; then
 			pushd ${archpkgdir}
 			for _partialpkg in ${pkgname[@]}; do
 				if [ "${arch}" == "any" ]; then
-					ln -s ../pool/${_partialpkg}-${pkgver}-${pkgrel}-any.pkg.tar.?z
-					ln -s ../pool/${_partialpkg}-${pkgver}-${pkgrel}-any.pkg.tar.?z.sig
-					toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-any\.pkg\.tar\..z" 2>/dev/null)
+					archpkgfile="../pool/${_partialpkg}-${pkgver}-${pkgrel}-any.pkg.tar.xz"
+					ln -s $archpkgfile
+					ln -s ${archpkgfile}.sig
+					toremove=$(ls ${_partialpkg}*.pkg.tar.xz* | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-any\.pkg\.tar\..z" 2>/dev/null)
 					if [ $? -eq 0 ]; then
 						echo $toremove
 						rm $toremove
 					fi
 				else
-					ln -s ../pool/${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.?z
-					ln -s ../pool/${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.?z.sig
-					toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${_arch}\.pkg\.tar\..z" 2>/dev/null)
-					if [ $? -eq 0 ]; then
-						echo $toremove
-						rm $toremove
+					archpkgfile="../pool/${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"
+					if [[ -e $archpkgfile ]]; then
+						ln -s $archpkgfile
+						ln -s ${archpkgfile}.sig
+						toremove=$(ls ${_partialpkg}*.pkg.tar.xz* | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${_arch}\.pkg\.tar\..z" 2>/dev/null)
+						if [ $? -eq 0 ]; then
+							echo $toremove
+							rm $toremove
+						fi
 					fi
 				fi
 			done

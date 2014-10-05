@@ -24,12 +24,12 @@ cd ${pkgrepo}/${repository}/pool
 msg2 "list packages to keep"
 for package in ${packages[@]}; do
 	ls -1tr $package-[0-9]* | tail -n 8
-done > "$varPath/cleanrepo.keep.tmp.txt"
+done > "$varPath/cleanpool.keep.tmp.txt"
 
 msgExec "remove old packages"
-rm -f $(ls -1 * | grep -xv "$(cat "$varPath/cleanrepo.keep.tmp.txt")") > /dev/null 2>&1 && success || error
+rm -f $(ls -1 * | grep -xv "$(cat "$varPath/cleanpool.keep.tmp.txt")") > /dev/null 2>&1 && success || error
 
 msg2 "remove temporary files"
-rm -f "$varPath/cleanrepo.keep.tmp.txt"
+rm -f "$varPath/cleanpool.keep.tmp.txt"
 
 #ls -1 xbmc-git* | sort | grep -v "$(ls xbmc-git* | sort | tail -n 8)"

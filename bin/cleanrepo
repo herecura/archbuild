@@ -10,17 +10,19 @@ fi
 
 returndir=`pwd`
 
-packtemp=$(ls -1)
-
-[ -e ${pkgrepo}/${repository}.txt ] && rm -f ${pkgrepo}/${repository}.txt
-
-for package in ${packtemp}
-do
-	if [ -d ${package} ]
-	then
-		echo ${package}.* >> ${pkgrepo}/${repository}.txt
-	fi
+msg "clean ${repository} packages"
+msg2 "building packages list"
+packages=()
+for pkgbuild in $(find -mindepth 2 -maxdepth 2 -name "PKGBUILD"); do
+	source $pkgbuild
+	packages+=(${pkgname[@]})
+	unset pkgname
 done
+
+msg2 "list packages to keep"
+for package in ${packages[@]}; do
+	echo "${package}-*"
+done > "$varPath/cleanrepo.keep.tmp.txt"
 
 function cleanRepo() {
 	if [ "$1" = "" ]; then
@@ -31,9 +33,9 @@ function cleanRepo() {
 	msg "clean ${repository} for ${1}"
 	cd ${packagesdir}
 	msg2 "following packages will be dropped:"
-	ls -1 *.pkg.tar.* | grep -xv "$(cat ${pkgrepo}/${repository}.txt)"
+	ls -1 *.pkg.tar.* | grep -v "$(cat "$varPath/cleanrepo.keep.tmp.txt")"
 	msgExec "dropping packages"
-	rm -f $(ls -1 *.pkg.tar.* | grep -xv "$(cat ${pkgrepo}/${repository}.txt)") > /dev/null 2>&1 && success || error
+	rm -f $(ls -1 *.pkg.tar.* | grep -v "$(cat "$varPath/cleanrepo.keep.tmp.txt")") > /dev/null 2>&1 && success || error
 }
 
 if [ "${rarch}" = "any" ]; then
@@ -44,7 +46,7 @@ else
 	done
 fi
 
-rm -f ${pkgrepo}/${repository}.txt
+rm -f "$varPath/cleanrepo.keep.tmp.txt"
 
 cd ${returndir}
 

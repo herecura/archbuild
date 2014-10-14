@@ -23,7 +23,9 @@ function regenRepo() {
 		rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
 	fi
 	msgExec "run repo-add"
-	repo-add ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+	repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+	msgExec "run repo-add files"
+	repo-add -f -q ${repository}.files.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
 }
 
 if [ "${rarch}" = "any" ]; then

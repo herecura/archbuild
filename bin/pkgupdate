@@ -6,6 +6,7 @@ set -e
 msg "Update package in the current directory"
 
 if [ ! -e PKGBUILD ] || [ ! -e .pkgupdate ]; then
+	errmsg "current dir: $(pwd)"
 	errmsg "this script must be run in a directory containing:"
 	errmsg "a PKGBUILD file and a .pkgupdate file"
 	exit 1

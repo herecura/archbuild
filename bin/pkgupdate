@@ -20,6 +20,14 @@ if [ ! -z "$1" ]; then
 	fi
 fi
 
+# force last commited state
+forcelast=0
+if [ ! -z "$2" ]; then
+	if [ "$2" = "forcelast" ]; then
+		forcelast=1
+	fi
+fi
+
 # default checksumupdate
 checksumupdate=1
 
@@ -42,7 +50,7 @@ fi
 # Use PKGBUILD directory if PKGDEST or SRCDEST don't exist
 [[ -d $SRCDEST ]] || SRCDEST=.
 
-if git symbolic-ref HEAD > /dev/null 2>&1 && [[ $dryrun == 0 ]]; then
+if git symbolic-ref HEAD > /dev/null 2>&1 && [[ $dryrun == 0 ]] && [[ $forcelast == 1 ]]; then
 	msg "go back to commited version"
 	git checkout .
 fi

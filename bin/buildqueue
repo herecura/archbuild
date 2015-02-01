@@ -37,7 +37,7 @@ function buildQueue {
 			done
 		fi
 
-		sleep 5
+		sleep 0.5
 
 		daemonControl
 		if [[ $? -eq 1 ]]; then

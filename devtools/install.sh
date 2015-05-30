@@ -21,10 +21,9 @@ done
 cd /usr/bin
 for repo in "${repos[@]}"; do
     for arch in "${archs[@]}"; do
-        ln -s archbuild "$repo-$arch-build"
+        [[ ! -L "$repo-$arch-build" ]] && ln -s archbuild "$repo-$arch-build"
     done
 done
 )
 
-exit
-
+exit 0

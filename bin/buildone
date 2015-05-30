@@ -1,221 +1,95 @@
 #!/bin/bash
 source "$(dirname $0)/../share/app-init"
 
-if [ ! -z "$1" ]; then
-	if [ -d "$1" ]; then
-		cd "$1"
-	elif [ -d "$rpdir/$1" ]; then
-		cd "$rpdir/$1";
-	else
-		errmsg "you have to pass an existing directory"
-		exit 1
-	fi
-fi
-
-if [ ! -e PKGBUILD ]; then
+if [[ ! -e PKGBUILD ]]; then
 	errmsg "this script must be run with a directory containing a PKGBUILD"
 	exit 1
 fi
 
-if [ ! -z "$2" ]; then
+if [[ ! -z "$2" ]]; then
 	commitmsg="$2"
 else
 	commitmsg=""
 fi
 
-## init
-inrepo=1
-thisfolder=`pwd`
-if [ -e ../repository ]; then
-	source ../repository
-	inrepo=0
-else
-	keepsource=0
-fi
-
-if [ $inrepo -eq 0 ]; then
-	packagesdir=${pkgrepo}/${repository}/pool/
-	[ ! -d ${packagesdir} ] && mkdir -p ${packagesdir}
-	case $repository in
-		*herecura-testing*)
-			buildbase='herecura-testing'
-			;;
-		*herecura*)
-			buildbase='herecura'
-			;;
-		*pre-community*)
-			buildbase='precommunity'
-			;;
-		*keep-old-system-alive*)
-			buildbase='keepoldalive'
-			;;
-		*)
-			buildbase='extra'
-			;;
-	esac
-else
-	buildbase='extra'
+buildbase=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
+# check if we have the buildscripts available
+if ! which "$buildbase-x86_64-build" > /dev/null 2>&1; then
+    buildbase="extra"
 fi
 
 ## build function
 function buildInChroot() {
-if [ "$1" == "any" ]; then
-	_arch=$1
-	buildx="sudo $buildbase-x86_64-build"
-else
-	_arch=$1
-	buildx="sudo $buildbase-$_arch-build"
-fi
-keepversion=$2
-buildopts=" -- -l archbuild"
-if [ ${keepsource} -ne 1 ]; then
-	buildopts="${buildopts} -- -c"
-fi
-fullpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
-if [[ ${testing} -eq 0 && -e "${packagesdir}/${fullpkg}" ]]; then
-	msg "package $fullpkg already exists"
-	return 250
-elif [[ ${testing} -eq 1 && ${install_what} = "" && -e "${packagesdir}/${fullpkg}" ]]; then
-	msg "package $fullpkg already exists"
-	return 250
-else
-	buildcmd="${buildx}${buildopts}"
-	eval ${buildcmd}
-	buildret=$?
-	if [ $buildret -eq 0 ]; then
-		msg "package $fullpkg successfully built"
-		return 0
-	elif [ $buildret -eq 255 ]; then
-		errmsg "creating build environment failed"
-		msg "retry with clean build environment"
-		buildcmd="${buildx} -c${buildopts}"
-		eval ${buildcmd}
-		if [ $? -eq 0 ]; then
-			msg "package $fullpkg successfully built"
-			return 0
-		else
-			errmsg "package $fullpkg failed"
-			return 241
-		fi
-	else
-		errmsg "package $fullpkg failed"
-		return 240
-	fi
-fi
-return 254
+    if [[ "$1" == "any" ]]; then
+        _arch=$1
+        buildx="sudo $buildbase-x86_64-build"
+    else
+        _arch=$1
+        buildx="sudo $buildbase-$_arch-build"
+    fi
+    buildopts=" -- -l archbuild"
+    buildcmd="${buildx}${buildopts}"
+    eval ${buildcmd}
+    buildret=$?
+    if [[ $buildret -eq 0 ]]; then
+        msg "package $fullpkg successfully built"
+        return 0
+    elif [[ $buildret -eq 255 ]]; then
+        errmsg "creating build environment failed"
+        msg "retry with clean build environment"
+        buildcmd="${buildx} -c${buildopts}"
+        eval ${buildcmd}
+        if [[ $? -eq 0 ]]; then
+            msg "package successfully built"
+            return 0
+        else
+            errmsg "package failed"
+            return 241
+        fi
+    else
+        errmsg "package failed"
+        return 240
+    fi
+    return 254
 }
 
 mkres=0
-firstone=1
 source PKGBUILD
-msg "run makepkg for ${pkgname}"
+if [[ "$pkgbase" == "" ]]; then
+	pkgbase=$pkgname
+fi
+msg "run makepkg for ${pkgbase}"
 for _arch in ${arch[@]}; do
 	msg2 ${_arch}
-	buildInChroot ${_arch} $firstone
+	buildInChroot ${_arch}
 	result=$?
-	firstone=0
-	msg2 "cleanup src and pkg"
-	rm -rf src/
-	rm -rf pkg/
 	if [[ $mkres -eq 0 && $result -ne 0 ]]; then
 		mkres=$result
 	fi
 done
 
-# cleanup lockfile so they cant accidentally be commited
-rm -f .lock
-
-source PKGBUILD
-if [ "$pkgbase" = "" ]; then
-	pkgbase=$pkgname
-fi
-fullpkg=${pkgbase}-${pkgver}-${pkgrel}
-if [ $inrepo -eq 0 ]; then
-	# test if a built testing package is the same as before
-	for _arch in ${arch[@]}; do
-		tstpkg=${pkgname}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz
-		if [[ ${testing} -eq 1 && -e "${packagesdir}/${tstpkg}" ]]; then
-			msg "package $tstpkg already exists"
-			mkres=250
-		fi
-	done
-
-	if [ ${mkres} -eq 0 ]; then
-		msg "package $fullpkg successfully built"
-		gpgsign
-		msg "move packages into package pool"
-		mv *.pkg.tar.xz *.pkg.tar.xz.sig ${packagesdir}
-
-		for _arch in ${rarch[@]}; do
-			archpkgdir=${pkgrepo}/${repository}/${_arch}
-			[ ! -d ${archpkgdir} ] && mkdir -p ${archpkgdir}
-			pushd ${archpkgdir}
-			for _partialpkg in ${pkgname[@]}; do
-				if [ "${arch}" == "any" ]; then
-					msg "${_partialpkg}-${pkgver}-${pkgrel}-any.pkg.tar.xz"
-					archpkgfile="../pool/${_partialpkg}-${pkgver}-${pkgrel}-any.pkg.tar.xz"
-					ln -s $archpkgfile
-					ln -s ${archpkgfile}.sig
-					toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-any\.pkg\.tar\..z" 2>/dev/null)
-					if [ $? -eq 0 ]; then
-						echo $toremove
-						rm $toremove
-					fi
-				else
-					msg "${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"
-					archpkgfile="../pool/${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"
-					if [[ -e $archpkgfile ]]; then
-						msg2 "$_arch pkg exists, link to it"
-						ln -s $archpkgfile
-						ln -s ${archpkgfile}.sig
-						toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${_arch}\.pkg\.tar\..z" 2>/dev/null)
-						if [ $? -eq 0 ]; then
-							echo $toremove
-							rm $toremove
-						fi
-					fi
-				fi
-			done
-			popd
-		done
-		pushd ../
-		regenrepo
-		popd
-	fi
-
-	# on success build commit into git tree
-	if [ ${mkres} -eq 0 ]; then
-		msg "commit sucessfull package"
-		git add -A .
-		finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"
-		if [ "$commitmsg" != "" ]; then
-			finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
-		fi
-		git commit -sm "${finalcommitmsg}"
-	fi
-
-	# if i maintain it in aur upload
-	if [ ${mkres} -eq 0 ] && [ -e AUR ]; then
-		# i maintain this so upload on success to aur
-		aurupload
-	fi
+# on success build commit into git tree
+if [[ ${mkres} -eq 0 ]]; then
+    msg "commit sucessfull package"
+    git add -A .
+    finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"
+    if [[ "$commitmsg" != "" ]]; then
+        finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
+    fi
+    git commit -sm "${finalcommitmsg}"
 fi
 
-if [ "${mailto}" != "" ]; then
+if [[ "${mailto}" != "" ]]; then
 	msg "send mail with the outcome of the build"
 	date=$(date +%Y-%m-%d\ %H:%M:%S)
-	if [ ${mkres} -eq 0 ]; then
+	if [[ ${mkres} -eq 0 ]]; then
 		# package success
 		logfiles=""
 		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
 			logfiles="$logfiles -a $logfile"
 		done
 		echo "SUCCESS build" | mail -s "archbuild $fullpkg success ${date}"$logfiles ${mailto}
-	elif [ ${mkres} -eq 250 ]; then
-		# package exists
-		echo "no mail for exists"
-		# echo "EXISTS build" | mail -s "archbuild ${thisfolder##*/} exists ${date}" ${mailto}
-	elif [ ${mkres} -eq 240 ] || [ ${mkres} -eq 241 ]; then
+	elif [[ ${mkres} -eq 240 ]] || [[ ${mkres} -eq 241 ]]; then
 		# package failed
 		logfiles=""
 		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
@@ -228,14 +102,6 @@ if [ "${mailto}" != "" ]; then
 	fi
 fi
 
-msg "cleanup possible leftovers"
-rm -rf src/
-rm -rf pkg/
-rm -f .lock
-if [ $inrepo -eq 0 ]; then
-	rm -f *.pkg.tar.?z*
-	rm -f *.log
-fi
 
 exit ${mkres}
 

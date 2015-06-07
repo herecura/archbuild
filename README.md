@@ -46,3 +46,9 @@ or branch.
 
 The package(s) will be removed from the repositories, and in git the ${repo}
 branch will be renamed to 'deleted'.
+
+## Dependencies
+******
+
+- devtools
+- pkgbuild-introspection

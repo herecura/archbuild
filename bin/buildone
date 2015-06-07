@@ -70,6 +70,8 @@ done
 
 # on success build commit into git tree
 if [[ ${mkres} -eq 0 ]]; then
+    msg "generate .SRCINFO"
+    mksrcinfo
     msg "commit sucessfull package"
     git add -A .
     finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"

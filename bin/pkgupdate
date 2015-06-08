@@ -84,20 +84,12 @@ else
 			if [ -z $update_pkgrel ]; then
 				sed -e "s/^pkgrel=.*/pkgrel=1/" -i PKGBUILD-updated
 			fi
-			if [ $checksumupdate -eq 1 ]; then
-				# clean checksums
-				cat PKGBUILD-updated |\
-					awk '/^.*sums=\(/,/)/ { next } 1 {print $0 }' \
-					> PKGBUILD
-			else
-				cp PKGBUILD-updated PKGBUILD
-			fi
+			cp PKGBUILD-updated PKGBUILD
 			# remove PKGBUILD used for updating
 			rm PKGBUILD-updated
 			# generate checksums
 			if [ $checksumupdate -eq 1 ]; then
-				makepkg -g >> PKGBUILD
-				rm -rf src
+				updpkgsums
 			fi
 			# start build
 			buildqueue-build $PWD

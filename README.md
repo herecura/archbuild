@@ -24,9 +24,12 @@ for example:
 ## Package management
 ******
 
-### update in repository
+### add/update in repository
 
-After a package is successfully built, update it in the repo's
+After a package is successfully built, update it in the repo's.
+
+Depending on the current branch you've checked out in your packages git repo,
+the built packages will be moved to the corresponding archlinux repository.
 
 ### move from/to repoistory
 

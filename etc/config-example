@@ -1,10 +1,6 @@
-# queue
-queuedir=/path/to/queue
-
 # path
 rpdir=/path/to/pkgbuilds
 pkgrepo=/path/to/pkgrepositories
-precommunity=/path/to/pre-community
 
 # chroot paths
 chroots=/path/to/chroots
@@ -18,9 +14,5 @@ mailto='nobody@example.com'
 # signing stuff
 gpgkeyf='add your long gpg id here (16char)'
 gpgpass='pass for signing'
-
-# log
-logfile="$varPath/log/archbuild-commands.log"
-queuelog="$varPath/log/buildqueue.log"
 
 # vim: ft=sh:

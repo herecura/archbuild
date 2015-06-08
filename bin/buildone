@@ -21,14 +21,15 @@ fi
 ## build function
 function buildInChroot() {
     if [[ "$1" == "any" ]]; then
-        _arch=$1
-        buildx="sudo $buildbase-x86_64-build"
-    else
-        _arch=$1
-        buildx="sudo $buildbase-$_arch-build"
+        _arch="x86_64"
+    fi
+    buildscript="$buildbase-${_arch}-build"
+    if ! which "$buildscript" > /dev/null 2>&1; then
+        errmsg "required buildscript for arch: $_arch not found"
+        return 230
     fi
     buildopts=" -- -l archbuild"
-    buildcmd="${buildx}${buildopts}"
+    buildcmd="sudo $buildscript -- -l archbuild"
     eval ${buildcmd}
     buildret=$?
     if [[ $buildret -eq 0 ]]; then
@@ -37,7 +38,7 @@ function buildInChroot() {
     elif [[ $buildret -eq 255 ]]; then
         errmsg "creating build environment failed"
         msg "retry with clean build environment"
-        buildcmd="${buildx} -c${buildopts}"
+        buildcmd="sudo $buildscript -c${buildopts}"
         eval ${buildcmd}
         if [[ $? -eq 0 ]]; then
             msg "package successfully built"

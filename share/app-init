@@ -12,8 +12,6 @@ varPath="$startPath/var"
 
 PATH=$binPath:$PATH
 
-source "$sharePath/functions"
-
 # fixed define of queuedir
 queuedir="$varPath/queue"
 [[ ! -d "$queuedir" ]] && mkdir -p "$queuedir"
@@ -21,10 +19,14 @@ queuedir="$varPath/queue"
 # fixed log folder/files
 [[ ! -d "$varPath/log" ]] && mkdir -p "$varPath/log"
 logfile="$varPath/log/archbuild-commands.log"
+
 queuelog="$varPath/log/buildqueue.log"
+
+source "$sharePath/functions"
 
 # fixed packagespool (big pool with all packages of all repo's)
 pkgpool="$pkgrepo/pool"
 [[ ! -d "$pkgpool" ]] && mkdir -p "$pkgpool"
+pkgpoolvsrepo="../../pool"
 
 # vim:set ft=sh:

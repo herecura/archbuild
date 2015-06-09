@@ -6,7 +6,11 @@ msg "Gpg sign all packages found in $(pwd)"
 if [ "$gpgkeyf" != "" ]; then
 	for pkgfile in $(find -name "*.pkg.tar.?z"); do
 		msgExec "signing ${pkgfile/\.\//}"
-		echo "$gpgpass" | gpg --pinentry-mode loopback --homedir ~/.gnupg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign $pkgfile 2>> $logfile && success || error
+        if [[ "$gpgpass" == "" ]]; then
+            gpg --homedir ~/.gnupg -u $gpgkeyf --batch --detach-sign $pkgfile 2>> $logfile && success || error
+        else
+            echo "$gpgpass" | gpg --pinentry-mode loopback --homedir ~/.gnupg -u $gpgkeyf --batch --passphrase-fd 0 --detach-sign $pkgfile 2>> $logfile && success || error
+        fi
 	done
 fi
 

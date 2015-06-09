@@ -1,3 +1,6 @@
+# architectures
+rarch=('i686' 'x86_64')
+
 # path
 rpdir=/path/to/pkgbuilds
 pkgrepo=/path/to/pkgrepositories
@@ -13,6 +16,6 @@ mailto='nobody@example.com'
 
 # signing stuff
 gpgkeyf='add your long gpg id here (16char)'
-gpgpass='pass for signing'
+gpgpass='pass for signing' # leave empty to use pinentry
 
 # vim: ft=sh:

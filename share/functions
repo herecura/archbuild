@@ -56,15 +56,29 @@ function warning() {
 	return 0;
 }
 
-stat_busy() {
+function stat_busy() {
 	local mesg=$1; shift
 	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}...${ALL_OFF}" >&2
 	log "==> $mesg..."
 }
 
-stat_done() {
+function stat_done() {
 	printf "${BOLD}done${ALL_OFF}\n" >&2
 	log "done"
+}
+
+##
+#  usage : in_array( $needle, $haystack )
+# return : 0 - found
+#          1 - not found
+##
+function in_array() {
+	local needle=$1; shift
+	local item
+	for item in "$@"; do
+		[[ $item = $needle ]] && return 0 # Found
+	done
+	return 1 # Not Found
 }
 
 function log() {

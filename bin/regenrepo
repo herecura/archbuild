@@ -3,35 +3,56 @@ source "$(dirname $0)/../share/app-init"
 
 msg "regenerate repository"
 
-if [ -e repository ]; then
-	source repository
-else
-	errmsg "You must run this script inside a repository"
+if [[ -z $1 ]]; then
+    errmsg "please give a repository name"
 	exit 1
 fi
 
+repository=$1
+
+repodir=${pkgrepo}/${repository}
+if [[ ! -d ${repodir} ]]; then
+    errmsg "the given repository does not exist"
+	exit 2
+fi
+
+if [[ ! -z $2 ]] && [[ "$2" == "clean" ]]; then
+    clean="clean"
+else
+    clean=""
+fi
+
 function regenRepo() {
-	if [ "$1" = "" ]; then
+	if [[ "$1" == "" ]]; then
 		errmsg "no architecture given"
 		return 1
 	fi
+
 	msg "regenerate ${repository} for ${1}"
-	packagesdir=${pkgrepo}/${repository/-any/}/${1}
+	packagesdir=${pkgrepo}/${repository}/${1}
+    if [[ ! -d "$packagesdir" ]]; then
+        errmsg "no folder for ${1}"
+        return 2
+    fi
+
 	cd ${packagesdir}
-	if [ "$2" = "clean" ]; then
+
+    if ! ls *.pkg.tar.?z > /dev/null 2>&1; then
+        errmsg "no packages for ${1}"
+        return 3
+    fi
+
+	if [[ "$2" == "clean" ]]; then
 		msgExec "remove db"
 		rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
 	fi
+
 	msgExec "run repo-add"
 	repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
 	msgExec "run repo-add files"
 	repo-add -f -q ${repository}.files.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
 }
 
-if [ "${rarch}" = "any" ]; then
-	regenRepo any $1
-else
-	for _arch in ${rarch}; do
-		regenRepo ${_arch} $1
-	done
-fi
+for _arch in ${rarch[@]}; do
+    regenRepo ${_arch} $clean
+done

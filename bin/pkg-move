@@ -38,7 +38,7 @@ res=0
 source PKGBUILD
 
 if [[ "$arch" == "any" ]]; then
-    pkgbuildarch=$rarch
+    pkgbuildarch=(${rarch[@]})
 else
     pkgbuildarch=()
     for _arch in ${arch[@]}; do

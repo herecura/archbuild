@@ -12,20 +12,14 @@ repository=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
 
 source PKGBUILD
 
-if [ "$pkgbase" = "" ]; then
-    pkgbase=$pkgname
-fi
-
-fullpkg=${pkgbase}-${pkgver}-${pkgrel}
-# test if a built package has the same name as before
 for _arch in ${arch[@]}; do
-
-    tstpkg=${fullpkg}-${_arch}.pkg.tar.xz
-    if [[ -e "${pkgpool}/${tstpkg}" ]]; then
-        errmsg "package $tstpkg already exists"
-        res=250
-    fi
-
+    for _partialpkg in ${pkgname[@]}; do
+        tstpkg="${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"
+        if [[ -e "${pkgpool}/${tstpkg}" ]]; then
+            errmsg "package $tstpkg already exists"
+            res=250
+        fi
+    done
 done
 
 if [[ $res -ne 0 ]]; then
@@ -38,7 +32,7 @@ msg "move packages into package pool"
 mv *.pkg.tar.xz *.pkg.tar.xz.sig ${pkgpool}
 
 if [[ "$arch" == "any" ]]; then
-    pkgbuildarch=rarch
+    pkgbuildarch=(${rarch[@]})
 else
     pkgbuildarch=()
     for _arch in ${arch[@]}; do
@@ -77,9 +71,7 @@ for _arch in ${pkgbuildarch[@]}; do
         fi
 
     done
-
     popd
-
 done
 
 regenrepo "$repository"

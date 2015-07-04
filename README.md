@@ -53,5 +53,7 @@ branch will be renamed to 'deleted'.
 ## Dependencies
 ******
 
+- bash
+- perl
 - devtools
 - pkgbuild-introspection

@@ -1,0 +1,119 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [[ ! -e PKGBUILD ]]; then
+	errmsg "this script must be run with a directory containing a PKGBUILD"
+	exit 1
+fi
+
+[[ -z $1 ]] && errmsg "pass the target (testing|main)" && exit 2
+
+currentrepo=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
+baserepo=${currentrepo%-testing}
+baserepo=${baserepo%-staging}
+
+if [[ "$1" == "testing" ]]; then
+    targetrepo="$baserepo-testing"
+elif [[ "$1" == "main" ]]; then
+    targetrepo="$baserepo"
+else
+    errmsg "pass the target (testing|main)"
+    exit 2
+fi
+
+# check if in main repo
+if [[ "$currentrepo" == "$baserepo" ]]; then
+    errmsg "You are trying to move from the main repo!"
+    exit 3
+fi
+
+# check if trying to move to self
+if [[ "$targetrepo" == "$currentrepo" ]]; then
+    errmsg "Can't move to the same repo"
+    exit 3
+fi
+
+res=0
+
+source PKGBUILD
+
+if [[ "$arch" == "any" ]]; then
+    pkgbuildarch=$rarch
+else
+    pkgbuildarch=()
+    for _arch in ${arch[@]}; do
+        echo $_arch
+        if in_array $_arch ${rarch[@]}; then
+            pkgbuildarch+=($_arch)
+        fi
+    done
+fi
+
+# check if target is not yet there (should not be)
+for _arch in ${pkgbuildarch[@]}; do
+
+    archpkgdir=${pkgrepo}/${targetrepo}/${_arch}
+    [ ! -d ${archpkgdir} ] && mkdir -p ${archpkgdir}
+
+    for _partialpkg in ${pkgname[@]}; do
+        if [[ "$arch" == "any" ]]; then
+            pkgarch="any"
+        else
+            pkgarch="$_arch"
+        fi
+
+        tgtpkg="${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        if [[ -e "${archpkgdir}/${tgtpkg}" ]]; then
+            errmsg "package $tgtpkg already exists"
+            res=250
+        fi
+    done
+done
+
+if [[ $res -ne 0 ]]; then
+    exit $res
+fi
+
+# move in git
+if [[ `git branch --list "$targetrepo"` ]]; then
+    checkoutextra=""
+else
+    checkoutextra="-b"
+fi
+
+git checkout $checkoutextra "$targetrepo"
+if [[ "$checkoutextra" == "" ]]; then
+    git merge "$currentrepo"
+fi
+
+# move from one repo to another
+for _arch in ${pkgbuildarch[@]}; do
+
+    srcarchpkgdir=${pkgrepo}/${currentrepo}/${_arch}
+    [ ! -d ${srcarchpkgdir} ] && mkdir -p ${srcarchpkgdir}
+    tgtarchpkgdir=${pkgrepo}/${targetrepo}/${_arch}
+    [ ! -d ${tgtarchpkgdir} ] && mkdir -p ${tgtarchpkgdir}
+
+    pushd ${tgtarchpkgdir}
+
+    for _partialpkg in ${pkgname[@]}; do
+        if [[ "$arch" == "any" ]]; then
+            pkgarch="any"
+        else
+            pkgarch="$_arch"
+        fi
+
+        tgtpkg="${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        mv "${srcarchpkgdir}/$tgtpkg" ./
+        mv "${srcarchpkgdir}/$tgtpkg".sig ./
+        toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}\.pkg\.tar\..z" 2>/dev/null)
+        if [ $? -eq 0 ]; then
+            echo $toremove
+            rm $toremove
+        fi
+    done
+    popd
+done
+
+regenrepo "$currentrepo"
+regenrepo "$targetrepo"

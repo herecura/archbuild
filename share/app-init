@@ -15,6 +15,9 @@ PATH=$binPath:$PATH
 # fixed define of queuedir
 queuedir="$varPath/queue"
 [[ ! -d "$queuedir" ]] && mkdir -p "$queuedir"
+# fixed define of dcontroldir
+dcontroldir="$varPath/dcontrol"
+[[ ! -d "$dcontroldir" ]] && mkdir -p "$dcontroldir"
 
 # fixed log folder/files
 [[ ! -d "$varPath/log" ]] && mkdir -p "$varPath/log"

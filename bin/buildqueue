@@ -68,7 +68,7 @@ function usage() {
 	exit 0
 }
 
-# default values fro run
+# default values for run
 daemon=0
 start=0
 stop=0

@@ -1,43 +1,39 @@
 #!/bin/bash
 source "$(dirname $0)/../share/app-init"
 
-if [ ! -z $1 ]; then
-	repofolder="$1"
-else
-	errmsg "folder of the repo is required"
-	exit 1
+run=""
+if [[ ! -z $1 ]]; then
+	if [[ "$1" = "run" ]]; then
+		run="$1"
+	fi
 fi
 
-if [ ! -z $2 ]; then
-	if [ "$2" = "run" ]; then
-		run="$2"
-	else
-		run=''
+vcs=""
+if [[ ! -z $2 ]]; then
+	if [[ "$2" == "vcs" ]]; then
+		vcs="forcelast"
 	fi
-else
-	run=''
-fi
-
-if [ ! -z $3 ]; then
-	if [ "$3" = "forcelast" ]; then
-		forcelast="$3"
-	else
-		forcelast=''
-	fi
-else
-	forcelast=''
 fi
 
 cd "${rpdir}"
 
-folders=$(ls -1 "${rpdir}/$repofolder")
+folders=$(find -mindepth 1 -maxdepth 1 -type d ! -iname .git)
 for folder in ${folders}
 do
-	if [ -d "${rpdir}/$repofolder/${folder}" ]; then
-		(
-			cd "${rpdir}/$repofolder/${folder}"
-			pkgupdate $run $forcelast
-		)
-	fi
+    if [[ "$folder" == *-git ]] \
+        || [[ "$folder" == *-svn ]] \
+        || [[ "$folder" == *-hg ]]; then
+        if [[ ! -z $vcs ]]; then
+            (
+            cd "$folder"
+            pkgupdate $run $vcs
+            )
+        fi
+    else
+        (
+        cd "$folder"
+        pkgupdate $run
+        )
+    fi
 done
 

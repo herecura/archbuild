@@ -6,12 +6,6 @@ if [[ ! -e PKGBUILD ]]; then
 	exit 1
 fi
 
-if [[ ! -z "$2" ]]; then
-	commitmsg="$2"
-else
-	commitmsg=""
-fi
-
 buildbase=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
 # check if we have the buildscripts available
 if ! which "$buildbase-x86_64-build" > /dev/null 2>&1; then
@@ -68,19 +62,6 @@ for _arch in ${arch[@]}; do
 		mkres=$result
 	fi
 done
-
-# on success build commit into git tree
-if [[ ${mkres} -eq 0 ]]; then
-    msg "generate .SRCINFO"
-    mksrcinfo
-    msg "commit sucessfull package"
-    git add -A .
-    finalcommitmsg="$pkgbase :: ${pkgver}-${pkgrel}"
-    if [[ "$commitmsg" != "" ]]; then
-        finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
-    fi
-    git commit -sm "${finalcommitmsg}"
-fi
 
 if [[ "${mailto}" != "" ]]; then
 	msg "send mail with the outcome of the build"

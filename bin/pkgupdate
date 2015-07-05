@@ -20,21 +20,13 @@ if [ ! -z "$1" ]; then
 	fi
 fi
 
-# force last commited state
-forcelast=0
-if [ ! -z "$2" ]; then
-	if [ "$2" = "forcelast" ]; then
-		forcelast=1
-	fi
-fi
-
 # default checksumupdate
 checksumupdate=1
 
 # check if in git tree
 if git symbolic-ref HEAD > /dev/null 2>&1; then
 	# update to latest
-	( cd ${rpdir} && git pull origin master )
+    [[ $(git remote) ]] && git pull
 fi
 
 # Read .makepkg.conf
@@ -49,11 +41,6 @@ fi
 
 # Use PKGBUILD directory if PKGDEST or SRCDEST don't exist
 [[ -d $SRCDEST ]] || SRCDEST=.
-
-if git symbolic-ref HEAD > /dev/null 2>&1 && [[ $dryrun == 0 ]] && [[ $forcelast == 1 ]]; then
-	msg "go back to commited version"
-	git checkout .
-fi
 
 msg "load PKGBUILD"
 source PKGBUILD

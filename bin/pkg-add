@@ -41,6 +41,8 @@ gpgsign
 
 msg "move packages into package pool"
 mv *.pkg.tar.xz *.pkg.tar.xz.sig ${pkgpool}
+msg "remove logs"
+rm *.log
 
 msg "generate .SRCINFO"
 mksrcinfo

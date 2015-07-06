@@ -23,6 +23,10 @@ fi
 
 source PKGBUILD
 
+if [[ "$pkgbase" == "" ]]; then
+    pkgbase=$pkgname
+fi
+
 for _arch in ${arch[@]}; do
     for _partialpkg in ${pkgname[@]}; do
         tstpkg="${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"

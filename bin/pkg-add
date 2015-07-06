@@ -57,6 +57,7 @@ if [[ "$commitmsg" != "" ]]; then
     finalcommitmsg="${finalcommitmsg} ;; ${commitmsg}"
 fi
 git commit -sm "${finalcommitmsg}"
+[[ $(git remote) ]] && git push -u
 
 if [[ "$arch" == "any" ]]; then
     pkgbuildarch=(${rarch[@]})

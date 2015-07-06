@@ -91,6 +91,7 @@ git checkout $checkoutextra "$targetrepo"
 if [[ "$checkoutextra" == "" ]]; then
     git merge "$currentrepo"
 fi
+[[ $(git remote) ]] && git push -u
 
 # move from one repo to another
 for _arch in ${pkgbuildarch[@]}; do

@@ -27,7 +27,7 @@ function buildInChroot() {
     eval ${buildcmd}
     buildret=$?
     if [[ $buildret -eq 0 ]]; then
-        msg "package $fullpkg successfully built"
+        msg "package $pkgbase $pkgver-$pkgrel successfully built"
         return 0
     elif [[ $buildret -eq 255 ]]; then
         errmsg "creating build environment failed"
@@ -72,20 +72,19 @@ if [[ "${mailto}" != "" ]]; then
 		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
 			logfiles="$logfiles -a $logfile"
 		done
-		echo "SUCCESS build" | mail -s "archbuild $fullpkg success ${date}"$logfiles ${mailto}
+		echo "SUCCESS build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel success ${date}"$logfiles ${mailto}
 	elif [[ ${mkres} -eq 240 ]] || [[ ${mkres} -eq 241 ]]; then
 		# package failed
 		logfiles=""
 		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
 			logfiles="$logfiles -a $logfile"
 		done
-		echo "FAILED build" | mail -s "archbuild $fullpkg failed ${date}"$logfiles ${mailto}
+		echo "FAILED build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}"$logfiles ${mailto}
 	else
 		# other failure
-		echo "OTHER FAIL build" | mail -s "archbuild $fullpkg failed ${date}" ${mailto}
+		echo "OTHER FAIL build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}" ${mailto}
 	fi
 fi
-
 
 exit ${mkres}
 

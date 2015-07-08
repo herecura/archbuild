@@ -12,8 +12,7 @@ repository=$1
 
 repodir=${pkgrepo}/${repository}
 if [[ ! -d ${repodir} ]]; then
-    errmsg "the given repository does not exist"
-	exit 2
+    mkdir -p "$repodir"
 fi
 
 if [[ ! -z $2 ]] && [[ "$2" == "clean" ]]; then
@@ -31,26 +30,27 @@ function regenRepo() {
 	msg "regenerate ${repository} for ${1}"
 	packagesdir=${pkgrepo}/${repository}/${1}
     if [[ ! -d "$packagesdir" ]]; then
-        errmsg "no folder for ${1}"
-        return 2
+        mkdir -p "$packagesdir"
     fi
 
 	cd ${packagesdir}
 
-    if ! ls *.pkg.tar.?z > /dev/null 2>&1; then
-        errmsg "no packages for ${1}"
-        return 3
+    if ls *.pkg.tar.?z > /dev/null 2>&1; then
+        if [[ "$2" == "clean" ]]; then
+            msgExec "remove db"
+            rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
+        fi
+
+        msgExec "run repo-add"
+        repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+        msgExec "run repo-add files"
+        repo-add -f -q ${repository}.files.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+    else
+        # empty
+        msgExec "create empty db"
+        tar -cf ${repository}.db.tar.gz -T /dev/null
+        ln -s ${repository}.db.tar.gz ${repository}.db
     fi
-
-	if [[ "$2" == "clean" ]]; then
-		msgExec "remove db"
-		rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
-	fi
-
-	msgExec "run repo-add"
-	repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
-	msgExec "run repo-add files"
-	repo-add -f -q ${repository}.files.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
 }
 
 for _arch in ${rarch[@]}; do

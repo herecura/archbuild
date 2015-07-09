@@ -49,7 +49,18 @@ function regenRepo() {
         # empty
         msgExec "create empty db"
         tar -cf ${repository}.db.tar.gz -T /dev/null
-        ln -s ${repository}.db.tar.gz ${repository}.db
+        res=$?
+        if [[ ! -e "${repository}.db" ]]; then
+            ln -s ${repository}.db.tar.gz ${repository}.db
+            if [[ ${res} -eq 0 ]]; then
+                res=$?
+            fi
+        fi
+        if [[ ${res} -eq 0 ]]; then
+            success
+        else
+            error
+        fi
     fi
 }
 

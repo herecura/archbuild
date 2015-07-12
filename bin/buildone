@@ -63,6 +63,11 @@ for _arch in ${arch[@]}; do
 	fi
 done
 
+if [[ ${mkres} -ne 0 ]]; then
+    # make sure there are no pkg files
+    rm -f *.pkg.tar.?z
+fi
+
 if [[ "${mailto}" != "" ]]; then
 	msg "send mail with the outcome of the build"
 	date=$(date +%Y-%m-%d\ %H:%M:%S)

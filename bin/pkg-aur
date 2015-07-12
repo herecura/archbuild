@@ -1,0 +1,41 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+if [[ ! -e PKGBUILD ]]; then
+	errmsg "this script must be run with a directory containing a PKGBUILD"
+	exit 1
+fi
+
+if ! git remote | grep aur > /dev/null 2>&1; then
+	errmsg "this script pushes to aur, you must have a remote named 'aur'"
+	exit 1
+fi
+
+currentrepo=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
+
+if [[ "$currentrepo" == "" ]]; then
+    errmsg "pkg-* tools must be run inside a git repo"
+    exit 1
+fi
+
+baserepo=${currentrepo%-testing}
+baserepo=${baserepo%-staging}
+
+# make sure if we have to create a new master that is starts in the base branch
+git checkout "$baserepo"
+
+# merge the 'base' tree with master to push to aur
+if [[ $(git branch --list master) ]]; then
+    checkoutextra=""
+else
+    checkoutextra="-b"
+fi
+
+git checkout $checkoutextra master
+if [[ "$checkoutextra" == "" ]]; then
+    git merge "$baserepo"
+fi
+git push -u aur
+
+# go back to the branch we started at
+git checkout "$currentrepo"

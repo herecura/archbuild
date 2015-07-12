@@ -6,12 +6,6 @@ if [ ! -e PKGBUILD ]; then
 	exit 1
 fi
 
-if [ ! -e $precommunity/repository ]; then
-	errmsg "you must have a pre-community repository"
-	exit 1
-fi
-source $precommunity/repository
-
 source PKGBUILD
 if [ "$pkgbase" = "" ]; then
 	pkgbase=$pkgname
@@ -24,23 +18,49 @@ old_pkgrel=$pkgrel
 
 msg2 "version: $old_pkgver-$old_pkgrel"
 
-if [ ! -e $precommunity/$pkgbase/PKGBUILD ]; then
+currentrepo=$(cd "$rpdir/$pkgbase"; git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
+
+if [[ "$currentrepo" == "" ]]; then
+    errmsg "cp-to-officia must source from a git repo"
+    exit 1
+fi
+
+baserepo=${currentrepo%-testing}
+baserepo=${baserepo%-staging}
+
+if [[ "$baserepo" != "blackeagle-pre-community" ]]; then
+    errmsg "the blackeagle-pre-community branch must be the base"
+    exit 1
+fi
+
+(
+    cd "$rpdir/$pkgbase"
+    git checkout $baserepo
+)
+
+if [ ! -e $rpdir/$pkgbase/PKGBUILD ]; then
 	errmsg "the PKGBUILD must exist in the pre-community repo"
 	exit 1
 fi
-source $precommunity/$pkgbase/PKGBUILD
+source $rpdir/$pkgbase/PKGBUILD
 
 msg2 "     to: $pkgver-$pkgrel"
 
 if [ $(vercmp "$pkgver-$pkgrel" "$old_pkgver-$old_pkgrel") -gt 0 ]; then
 	msg "update official repo"
-	( cd $precommunity/$pkgbase/; makepkg --source; rm -rf src/ )
-	mv $precommunity/$pkgbase/$pkgbase-$pkgver-$pkgrel.src.tar.gz ./
+	( cd $rpdir/$pkgbase/; makepkg --source; rm -rf src/ )
+	mv $rpdir/$pkgbase/$pkgbase-$pkgver-$pkgrel.src.tar.gz ./
 	tar --strip-components=1 -xf $pkgbase-$pkgver-$pkgrel.src.tar.gz
 	rm -f $pkgbase-$pkgver-$pkgrel.src.tar.gz
+    rm -f .SRCINFO
 	for splitpkg in ${pkgname[@]}; do
 		for _arch in ${arch[@]}; do
-			cp $pkgrepo/$repository/pool/$splitpkg-$pkgver-$pkgrel-$_arch.pkg.tar.?z* ./
+			cp $pkgrepo/pool/$splitpkg-$pkgver-$pkgrel-$_arch.pkg.tar.?z* ./
 		done
 	done
 fi
+
+(
+    cd "$rpdir/$pkgbase"
+    git checkout $currentrepo
+)

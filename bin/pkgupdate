@@ -26,7 +26,7 @@ checksumupdate=1
 # check if in git tree
 if git symbolic-ref HEAD > /dev/null 2>&1; then
 	# update to latest
-    [[ $(git remote) ]] && git pull
+    [[ $(git remote) ]] && git pull || echo 'configure git'
 fi
 
 # Read .makepkg.conf

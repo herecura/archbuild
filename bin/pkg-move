@@ -103,6 +103,8 @@ for _arch in ${pkgbuildarch[@]}; do
 
     pushd ${tgtarchpkgdir}
 
+    archpackages=()
+
     for _partialpkg in ${pkgname[@]}; do
         if [[ "$arch" == "any" ]]; then
             pkgarch="any"
@@ -113,14 +115,32 @@ for _arch in ${pkgbuildarch[@]}; do
         tgtpkg="${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}.pkg.tar.xz"
         mv "${srcarchpkgdir}/$tgtpkg" ./
         mv "${srcarchpkgdir}/$tgtpkg".sig ./
+        archpackages+=("$tgtpkg")
         toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}\.pkg\.tar\..z" 2>/dev/null)
         if [ $? -eq 0 ]; then
             echo $toremove
             rm $toremove
         fi
     done
+
+    msgExec "run repo-remove"
+    repo-remove -q ${targetrepo}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+    msgExec "run repo-remove files"
+    repo-remove -f -q ${targetrepo}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+    msgExec "run repo-add"
+    repo-add -q ${targetrepo}.db.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
+    msgExec "run repo-add files"
+    repo-add -f -q ${targetrepo}.files.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
+
+    popd
+
+    pushd ${srcarchpkgdir}
+
+    msgExec "run repo-remove"
+    repo-remove -q ${currentrepo}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+    msgExec "run repo-remove files"
+    repo-remove -f -q ${currentrepo}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+
     popd
 done
 
-regenrepo "$currentrepo"
-regenrepo "$targetrepo"

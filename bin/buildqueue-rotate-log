@@ -1,9 +1,13 @@
 #!/bin/bash
 source "$(dirname $0)/../share/app-init"
 
+msg "stop buildqueue"
+buildqueue -q
 msg "Rotating buildqueue log"
 cd "$(dirname "$queuelog")"
 mv buildqueue.log buildqueue-$(date --date="yesterday" +%Y%m%d).log
 msg "cleaning up old buildqueue logs"
 find -type f -mtime +4 -delete
+msg "start buildqueue"
+buildqueue -s -d
 stat_done

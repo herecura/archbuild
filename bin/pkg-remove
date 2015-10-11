@@ -40,7 +40,12 @@ for _arch in ${pkgbuildarch[@]}; do
             rm $toremove
         fi
     done
+
+    msgExec "run repo-remove"
+    repo-remove -q ${currentrepo}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+    msgExec "run repo-remove files"
+    repo-remove -f -q ${currentrepo}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
+
     popd
 done
 
-regenrepo "$currentrepo"

@@ -9,18 +9,16 @@ source "$(dirname $0)/../share/app-init"
 
 function runQueueItem {
 	currentQueue=$(date +%Y%m%d\ %H%M%S)
-	(
-		echo " "
-		echo "------------------------------------------------------------"
-		echo "running queueitem ${currentQueue}"
-		echo "------------------------------------------------------------"
-		source ${queuedir}/${1}
-		rm -f ${queuedir}/${1}
-		echo "------------------------------------------------------------"
-		echo "done queueitem ${currentQueue}"
-		echo "------------------------------------------------------------"
-		echo " "
-	) >> "$queuelog" 2>&1
+    echo " "
+    echo "------------------------------------------------------------"
+    echo "running queueitem ${currentQueue}"
+    echo "------------------------------------------------------------"
+    source ${queuedir}/${1}
+    rm -f ${queuedir}/${1}
+    echo "------------------------------------------------------------"
+    echo "done queueitem ${currentQueue}"
+    echo "------------------------------------------------------------"
+    echo " "
 }
 
 function buildQueue {
@@ -92,9 +90,9 @@ else
 			echo "The $(basename $0) daemon is already runnig";
 		else
 			if [[ $daemon -eq 1 ]]; then
-				buildQueue &
+                (buildQueue | tee "$queuelog") &
 			else
-				buildQueue
+				(buildQueue | tee "$queuelog")
 			fi
 		fi
 	elif [[ $stop -eq 1 ]]; then

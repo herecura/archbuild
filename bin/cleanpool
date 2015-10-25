@@ -1,35 +1,25 @@
 #!/bin/bash
 source "$(dirname $0)/../share/app-init"
 
-if [ -e repository ]; then
-	source repository
-else
-	errmsg "You must run this script inside a repository"
-	exit 1
-fi
-
-returndir=`pwd`
-
-msg "clean ${repository} pool"
-msg2 "building packages list"
-packages=()
-for pkgbuild in $(find -mindepth 2 -maxdepth 2 -name "PKGBUILD"); do
-	source $pkgbuild
-	packages+=(${pkgname[@]})
-	unset pkgname
+msg "clean pool"
+msg2 "list packages to keep"
+cd ${pkgrepo}
+for repodir in $(find -mindepth 2 -maxdepth 2 -type d); do
+    echo $repodir
+    (
+    cd $repodir
+    ls -1 *.pkg.tar.?z* >> "$varPath/cleanpool.keep"
+    )
 done
 
-cd ${pkgrepo}/${repository}/pool
-
-msg2 "list packages to keep"
-for package in ${packages[@]}; do
-	ls -1tr $package-[0-9]* | tail -n 8
-done > "$varPath/cleanpool.keep.tmp.txt"
+msg2 "list packages to remove"
+cd ${pkgrepo}/pool
+ls -1 *.pkg.tar.?z* | grep -xv "$(cat "$varPath/cleanpool.keep")" > "$varPath/cleanpool.delete"
 
 msgExec "remove old packages"
-rm -f $(ls -1 * | grep -xv "$(cat "$varPath/cleanpool.keep.tmp.txt")") > /dev/null 2>&1 && success || error
+rm -f $(cat "$varPath/cleanpool.delete") > /dev/null 2>&1 && success || error
 
 msg2 "remove temporary files"
-rm -f "$varPath/cleanpool.keep.tmp.txt"
+rm -f "$varPath/cleanpool.keep"
+rm -f "$varPath/cleanpool.delete"
 
-#ls -1 xbmc-git* | sort | grep -v "$(ls xbmc-git* | sort | tail -n 8)"

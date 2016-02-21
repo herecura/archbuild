@@ -62,5 +62,6 @@ fi
 
 (
     cd "$rpdir/$pkgbase"
+    pkg-remove
     git checkout $currentrepo
 )

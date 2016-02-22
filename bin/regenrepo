@@ -43,8 +43,6 @@ function regenRepo() {
 
         msgExec "run repo-add"
         repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
-        msgExec "run repo-add files"
-        repo-add -f -q ${repository}.files.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
     else
         # empty
         msgExec "create empty db"

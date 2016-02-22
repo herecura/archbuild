@@ -125,12 +125,8 @@ for _arch in ${pkgbuildarch[@]}; do
 
     msgExec "run repo-remove"
     repo-remove -q ${targetrepo}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
-    msgExec "run repo-remove files"
-    repo-remove -f -q ${targetrepo}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
     msgExec "run repo-add"
     repo-add -q ${targetrepo}.db.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
-    msgExec "run repo-add files"
-    repo-add -f -q ${targetrepo}.files.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
 
     popd
 
@@ -138,8 +134,6 @@ for _arch in ${pkgbuildarch[@]}; do
 
     msgExec "run repo-remove"
     repo-remove -q ${currentrepo}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
-    msgExec "run repo-remove files"
-    repo-remove -f -q ${currentrepo}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
 
     popd
 done

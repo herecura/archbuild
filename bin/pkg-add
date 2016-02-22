@@ -112,12 +112,8 @@ for _arch in ${pkgbuildarch[@]}; do
 
     msgExec "run repo-remove"
     repo-remove -q ${repository}.db.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
-    msgExec "run repo-remove files"
-    repo-remove -f -q ${repository}.files.tar.gz ${pkgname[@]} > /dev/null 2>&1 && success || error
     msgExec "run repo-add"
     repo-add -q ${repository}.db.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
-    msgExec "run repo-add files"
-    repo-add -f -q ${repository}.files.tar.gz ${archpackages[@]} > /dev/null 2>&1 && success || error
 
     popd
 done

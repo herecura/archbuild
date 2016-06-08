@@ -46,7 +46,7 @@ source $rpdir/$pkgbase/PKGBUILD
 
 msg2 "     to: $pkgver-$pkgrel"
 
-if [ $(vercmp "$pkgver-$pkgrel" "$old_pkgver-$old_pkgrel") -gt 0 ]; then
+if [ $(vercmp "$pkgver-$pkgrel" "$old_pkgver-$old_pkgrel") -ge 0 ]; then
 	msg "update official repo"
 	( cd $rpdir/$pkgbase/; makepkg --source; rm -rf src/ )
 	mv $rpdir/$pkgbase/$pkgbase-$pkgver-$pkgrel.src.tar.gz ./

@@ -1,0 +1,17 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+###
+# this script must be run inside the official svn packages repo
+###
+
+packages="$@"
+
+for package in $packages; do
+    if [[ ! -e "$rpdir/$package/PKGBUILD" ]]; then
+        errmsg "$package does not have a PKGBUILD"
+    else
+        communityco "$package"
+        ( cd "$package/trunk"; cp-to-official && communitypkg && rm -f *.pkg.tar.?z*)
+    fi
+done

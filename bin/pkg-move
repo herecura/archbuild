@@ -90,6 +90,10 @@ fi
 git checkout $checkoutextra "$targetrepo"
 if [[ "$checkoutextra" == "" ]]; then
     git merge "$currentrepo"
+    if [[ $? -ne 0 ]]; then
+        git checkout "$currentrepo" -- .
+        git commit --no-edit
+    fi
 fi
 [[ $(git remote) ]] && git push -u
 

@@ -11,6 +11,14 @@ if [ "$pkgbase" = "" ]; then
 	pkgbase=$pkgname
 fi
 
+# main
+main=0
+if [ ! -z "$1" ]; then
+	if [ "$1" = "main" ]; then
+		main=1
+	fi
+fi
+
 msg "$pkgbase"
 
 old_pkgver=$pkgver
@@ -21,7 +29,7 @@ msg2 "version: $old_pkgver-$old_pkgrel"
 currentrepo=$(cd "$rpdir/$pkgbase"; git symbolic-ref HEAD | sed -e 's/refs\/heads\///' 2> /dev/null)
 
 if [[ "$currentrepo" == "" ]]; then
-    errmsg "cp-to-officia must source from a git repo"
+    errmsg "cp-to-official must source from a git repo"
     exit 1
 fi
 
@@ -33,10 +41,12 @@ if [[ "$baserepo" != "blackeagle-pre-community" ]]; then
     exit 1
 fi
 
-(
-    cd "$rpdir/$pkgbase"
-    git checkout $baserepo
-)
+if [ $main -eq 1 ]; then
+    (
+        cd "$rpdir/$pkgbase"
+        git checkout $baserepo
+    )
+fi
 
 if [ ! -e $rpdir/$pkgbase/PKGBUILD ]; then
 	errmsg "the PKGBUILD must exist in the pre-community repo"

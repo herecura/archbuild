@@ -38,6 +38,7 @@ for _arch in ${arch[@]}; do
 done
 
 if [[ $res -ne 0 ]]; then
+    rm -f *.pkg.tar.?z
     exit $res
 fi
 

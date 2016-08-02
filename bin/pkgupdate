@@ -76,7 +76,13 @@ else
 			rm PKGBUILD-updated
 			# generate checksums
 			if [ $checksumupdate -eq 1 ]; then
+                set +e
 				updpkgsums
+                if [ $? -ne 0 ]; then
+                    git reset --hard
+                    errmsg "could not update the checksums"
+                    exit 1
+                fi
 			fi
 			# start build
 			buildqueue-build $PWD

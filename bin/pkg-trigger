@@ -1,0 +1,46 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+set -e
+
+msg "trigger dependencies build"
+
+if [ ! -e PKGBUILD ] || [ ! -e .pkgtrigger ]; then
+	errmsg "current dir: $(pwd)"
+	errmsg "this script must be run in a directory containing:"
+	errmsg "a PKGBUILD file and a .pkgtrigger file"
+	exit 1
+fi
+
+# dryrun
+dryrun=""
+if [ ! -z "$1" ]; then
+	if [ "$1" = "run" ]; then
+		dryrun="run"
+	fi
+fi
+
+msg "load PKGBUILD"
+source PKGBUILD
+
+if [ "$pkgbase" = "" ]; then
+	pkgbase=$pkgname
+fi
+
+msg "$pkgbase version: $pkgver"
+
+source .pkgtrigger
+
+if [ -z $dependencypackages ]; then
+    errmsg "there is no use to trigger dependency builds when no packages are defined";
+    exit 1
+fi
+
+for package in "${dependencypackages[@]}"; do
+    (
+        cd "$rpdir/$package"
+        echo "$pkgupdate" > .pkgupdate
+        pkgupdate $dryrun
+        rm .pkgupdate
+    )
+done

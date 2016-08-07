@@ -39,6 +39,7 @@ done
 
 if [[ $res -ne 0 ]]; then
     rm -f *.pkg.tar.?z
+    rm -f *.log
     exit $res
 fi
 

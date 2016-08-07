@@ -57,37 +57,39 @@ msg "$pkgbase new version: $update_pkgver"
 
 if [ "$update_pkgver" = "" ]; then
 	msg "$pkgbase no new version found"
-else
-	if [ $(vercmp "$update_pkgver" "$pkgver") -gt 0 ]; then
-		msg "$pkgbase :: update PKGBUILD to version $update_pkgver"
+    exit 0
+fi
 
-		if [ $dryrun -eq 0 ]; then
-			cp PKGBUILD PKGBUILD-updated
-			for updvar in ${!update_*}; do
-				sed \
-					-e "s/^${updvar#update_}=.*/${updvar#update_}=$(eval echo \$$updvar)/" \
-					-i PKGBUILD-updated
-			done
-			if [ -z $update_pkgrel ]; then
-				sed -e "s/^pkgrel=.*/pkgrel=1/" -i PKGBUILD-updated
-			fi
-			cp PKGBUILD-updated PKGBUILD
-			# remove PKGBUILD used for updating
-			rm PKGBUILD-updated
-			# generate checksums
-			if [ $checksumupdate -eq 1 ]; then
-                set +e
-				updpkgsums
-                if [ $? -ne 0 ]; then
-                    git reset --hard
-                    errmsg "could not update the checksums"
-                    exit 1
-                fi
-			fi
-			# start build
-			buildqueue-build $PWD
-		fi
-	else
-		msg "$pkgbase new version is the same as the previous version"
-	fi
+if [ $(vercmp "$update_pkgver" "$pkgver") -le 0 ]; then
+    msg "$pkgbase new version is the same as the previous version"
+    exit 0
+fi
+
+msg "$pkgbase :: update PKGBUILD to version $update_pkgver"
+
+if [ $dryrun -eq 0 ]; then
+    cp PKGBUILD PKGBUILD-updated
+    for updvar in ${!update_*}; do
+        sed \
+            -e "s/^${updvar#update_}=.*/${updvar#update_}=$(eval echo \$$updvar)/" \
+            -i PKGBUILD-updated
+    done
+    if [ -z $update_pkgrel ]; then
+        sed -e "s/^pkgrel=.*/pkgrel=1/" -i PKGBUILD-updated
+    fi
+    cp PKGBUILD-updated PKGBUILD
+    # remove PKGBUILD used for updating
+    rm PKGBUILD-updated
+    # generate checksums
+    if [ $checksumupdate -eq 1 ]; then
+        set +e
+        updpkgsums
+        if [ $? -ne 0 ]; then
+            git reset --hard
+            errmsg "could not update the checksums"
+            exit 1
+        fi
+    fi
+    # start build
+    buildqueue-build $PWD
 fi

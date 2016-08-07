@@ -29,5 +29,6 @@ buildqueue-add \
     "cd $folder" \
     "buildone" \
     "pkg-add $commitmsg" \
-    "pkg-aur"
+    "pkg-trigger run || true" \
+    "pkg-aur || true"
 

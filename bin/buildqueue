@@ -13,7 +13,7 @@ function runQueueItem {
 	echo "------------------------------------------------------------"
 	echo "running queueitem ${currentQueue}"
 	echo "------------------------------------------------------------"
-	source ${queuedir}/${1}
+	/bin/bash ${queuedir}/${1}
 	rm -f ${queuedir}/${1}
 	echo "------------------------------------------------------------"
 	echo "done queueitem ${currentQueue}"

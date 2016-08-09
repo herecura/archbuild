@@ -60,7 +60,16 @@ if [ "$update_pkgver" = "" ]; then
     exit 0
 fi
 
-if [ $(vercmp "$update_pkgver" "$pkgver") -le 0 ]; then
+oldversion="$pkgver-$pkgrel"
+newversion="$update_pkgver-1"
+if [ ! -z $update_pkgrel ]; then
+    newversion="$update_pkgver-$update_pkgrel"
+fi
+
+msg "old version: $oldversion"
+msg "new version: $newversion"
+
+if [ $(vercmp "$newversion" "$oldversion") -le 0 ]; then
     msg "$pkgbase new version is the same as the previous version"
     exit 0
 fi

@@ -94,7 +94,13 @@ for _arch in ${pkgbuildarch[@]}; do
             pkgarch="$_arch"
         fi
 
-        archpkg="${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        if [[ ! -z "$epoch" ]]; then
+            pkgversion="$epoch:$pkgver"
+        else
+            pkgversion="$pkgver"
+        fi
+
+        archpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.xz"
         msg "$archpkg"
 
         archpkgfile="$pkgpoolvsrepo/$archpkg"

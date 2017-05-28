@@ -1,0 +1,12 @@
+#!/bin/bash
+source "$(dirname $0)/../share/app-init"
+
+msg "sync repo when queue is empty"
+
+cntqueue=$(ls -1 ${queuedir} | wc -l)
+if [[ 0 -eq $cntqueue ]]; then
+    msg "syncrepo"
+    buildqueue-add syncrepo
+fi
+
+stat_done

@@ -23,6 +23,9 @@ msg "$pkgbase"
 
 old_pkgver=$pkgver
 old_pkgrel=$pkgrel
+if [[ ! -z "$epoch" ]]; then
+    old_pkgver="$epoch:$old_pkgver"
+fi
 
 msg2 "version: $old_pkgver-$old_pkgrel"
 
@@ -54,17 +57,17 @@ if [ ! -e $rpdir/$pkgbase/PKGBUILD ]; then
 fi
 source $rpdir/$pkgbase/PKGBUILD
 
-msg2 "     to: $pkgver-$pkgrel"
+if [[ ! -z "$epoch" ]]; then
+    pkgversion="$epoch:$pkgver"
+else
+    pkgversion="$pkgver"
+fi
 
-if [ $(vercmp "$pkgver-$pkgrel" "$old_pkgver-$old_pkgrel") -ge 0 ]; then
+msg2 "     to: $pkgversion-$pkgrel"
+
+if [ $(vercmp "$pkgversion-$pkgrel" "$old_pkgver-$old_pkgrel") -ge 0 ]; then
 	msg "update official repo"
 	( cd $rpdir/$pkgbase/; makepkg --source; rm -rf src/ )
-
-    if [[ ! -z "$epoch" ]]; then
-        pkgversion="$epoch:$pkgver"
-    else
-        pkgversion="$pkgver"
-    fi
 
 	mv "$rpdir/$pkgbase/$pkgbase-$pkgversion-$pkgrel.src.tar.gz" ./
 	bsdtar --strip-components=1 -xf "$pkgbase-$pkgversion-$pkgrel.src.tar.gz"

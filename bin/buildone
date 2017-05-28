@@ -61,18 +61,14 @@ if [[ "${mailto}" != "" ]]; then
 	date=$(date +%Y-%m-%d\ %H:%M:%S)
 	if [[ ${mkres} -eq 0 ]]; then
 		# package success
-		logfiles=""
-		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
-			logfiles="$logfiles -a $logfile"
-		done
-		echo "SUCCESS build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel success ${date}"$logfiles ${mailto}
+        # zip logfiles and attach zip
+        tar -zcf logfiles.tar.gz *.log
+		echo "SUCCESS build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel success ${date}" -a logfiles.tar.gz ${mailto}
 	elif [[ ${mkres} -eq 240 ]] || [[ ${mkres} -eq 241 ]]; then
 		# package failed
-		logfiles=""
-		for logfile in $(find . -mindepth 1 -maxdepth 1 -type f -name '*.log'); do
-			logfiles="$logfiles -a $logfile"
-		done
-		echo "FAILED build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}"$logfiles ${mailto}
+        # zip logfiles and attach zip
+        tar -zcf logfiles.tar.gz *.log
+		echo "FAILED build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}" -a logfiles.tar.gz ${mailto}
 	else
 		# other failure
 		echo "OTHER FAIL build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}" ${mailto}

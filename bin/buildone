@@ -64,11 +64,15 @@ if [[ "${mailto}" != "" ]]; then
         # zip logfiles and attach zip
         tar -zcf logfiles.tar.gz *.log
 		echo "SUCCESS build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel success ${date}" -a logfiles.tar.gz ${mailto}
+        # clean logfiles zip
+        rm logfiles.tar.gz
 	elif [[ ${mkres} -eq 240 ]] || [[ ${mkres} -eq 241 ]]; then
 		# package failed
         # zip logfiles and attach zip
         tar -zcf logfiles.tar.gz *.log
 		echo "FAILED build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}" -a logfiles.tar.gz ${mailto}
+        # clean logfiles zip
+        rm logfiles.tar.gz
 	else
 		# other failure
 		echo "OTHER FAIL build" | mail -s "archbuild $pkgbase $pkgver-$pkgrel failed ${date}" ${mailto}

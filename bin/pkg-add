@@ -109,7 +109,7 @@ for _arch in ${pkgbuildarch[@]}; do
             archpackages+=("$archpkg")
             ln -s $archpkgfile
             ln -s ${archpkgfile}.sig
-            toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgver}-${pkgrel}-${pkgarch}\.pkg\.tar\..z" 2>/dev/null)
+            toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._:]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}\.pkg\.tar\..z" 2>/dev/null)
             if [ $? -eq 0 ]; then
                 echo $toremove
                 rm $toremove

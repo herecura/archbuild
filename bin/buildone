@@ -22,12 +22,14 @@ function buildInChroot() {
         errmsg "required buildscript for arch: $_arch not found"
         return 230
     fi
-    buildopts=" -c -- -l archbuild"
+    #buildopts=" -c -- -l archbuild"
+    buildopts=" -- -l archbuild"
     buildcmd="sudo $buildscript $buildopts"
     eval ${buildcmd}
     buildret=$?
     if [[ $buildret -eq 0 ]]; then
         msg "package $pkgbase $pkgver-$pkgrel successfully built"
+        checkpkg
         return 0
     else
         errmsg "package failed"

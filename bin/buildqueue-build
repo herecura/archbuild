@@ -28,7 +28,7 @@ msg "add new build to buildqueue"
 buildqueue-add \
     "cd $folder" \
     "buildone" \
-    "pkg-add $commitmsg" \
+    "pkg-add \"$commitmsg\"" \
     "pkg-trigger run || true" \
     "pkg-aur || true"
 

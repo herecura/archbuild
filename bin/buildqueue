@@ -92,12 +92,19 @@ else
 			if [[ $daemon -eq 1 ]]; then
 				(buildQueue >> "$queuelog" 2>&1) &
 			else
-				(buildQueue 2>&1 | tee "$queuelog")
+				(buildQueue >> "$queuelog" 2>&1)
 			fi
 		fi
 	elif [[ $stop -eq 1 ]]; then
 		if [[ -e "$dcontroldir/.isrunning" ]]; then
 			touch "$dcontroldir/.stoprunning"
+            if [[ -f "$dcontroldir/.isrunning" ]]; then
+                echo "waiting for daemon to stop"
+            fi
+            while [[ -f "$dcontroldir/.isrunning" ]]; do
+                echo -n '.'
+                sleep 1
+            done
 		else
 			echo "The $(basename $0) daemon is not running"
 		fi

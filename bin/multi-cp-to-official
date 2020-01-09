@@ -12,6 +12,6 @@ for package in $packages; do
         errmsg "$package does not have a PKGBUILD"
     else
         communityco "$package"
-        ( cd "$package/trunk"; cp-to-official main && communitypkg && rm -f *.pkg.tar.?z*)
+        ( cd "$package/trunk"; cp-to-official main && communitypkg && rm -f *.pkg.tar.*)
     fi
 done

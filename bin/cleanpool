@@ -7,14 +7,14 @@ cd ${pkgrepo}
 for repodir in $(find -mindepth 2 -maxdepth 2 -type d); do
     echo $repodir
     (
-    cd $repodir
-    ls -1 *.pkg.tar.?z* >> "$varPath/cleanpool.keep"
+        cd $repodir
+        ls -1 *.pkg.tar.* >> "$varPath/cleanpool.keep"
     )
 done
 
 msg2 "list packages to remove"
 cd ${pkgrepo}/pool
-ls -1 *.pkg.tar.?z* | grep -xv "$(cat "$varPath/cleanpool.keep")" > "$varPath/cleanpool.delete"
+ls -1 *.pkg.tar.* | grep -xv "$(cat "$varPath/cleanpool.keep")" > "$varPath/cleanpool.delete"
 
 msgExec "remove old packages"
 rm -f $(cat "$varPath/cleanpool.delete") > /dev/null 2>&1 && success || error

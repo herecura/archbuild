@@ -76,7 +76,7 @@ if [ $(vercmp "$pkgversion-$pkgrel" "$old_pkgver-$old_pkgrel") -ge 0 ]; then
     svn add * || true
 	for splitpkg in ${pkgname[@]}; do
 		for _arch in ${arch[@]}; do
-			cp "$pkgrepo/pool/$splitpkg-$pkgversion-$pkgrel-$_arch".pkg.tar.?z* ./
+			cp "$pkgrepo/pool/$splitpkg-$pkgversion-$pkgrel-$_arch".pkg.tar.* ./
 		done
 	done
 fi

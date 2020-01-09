@@ -35,14 +35,14 @@ function regenRepo() {
 
 	cd ${packagesdir}
 
-    if ls *.pkg.tar.?z > /dev/null 2>&1; then
+    if ls *.pkg.tar.* > /dev/null 2>&1; then
         if [[ "$2" == "clean" ]]; then
             msgExec "remove db"
             rm -f ${repository}.db.tar.* > /dev/null 2>&1 && success || error
         fi
 
         msgExec "run repo-add"
-        repo-add -q ${repository}.db.tar.gz *.pkg.tar.?z > /dev/null 2>&1 && success || error
+        repo-add -q ${repository}.db.tar.gz $(ls -1 | grep 'pkg.tar.[a-z]\+$') > /dev/null 2>&1 && success || error
     else
         # empty
         msgExec "create empty db"

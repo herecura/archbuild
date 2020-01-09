@@ -4,7 +4,7 @@ source "$(dirname $0)/../share/app-init"
 msg "Gpg sign all packages found in $(pwd)"
 
 if [ "$gpgkeyf" != "" ]; then
-	for pkgfile in $(find -name "*.pkg.tar.?z"); do
+	for pkgfile in $(ls -1 | grep 'pkg.tar.[a-z]\+$'); do
 		msgExec "signing ${pkgfile/\.\//}"
         if [[ "$gpgpass" == "" ]]; then
             gpg --homedir ~/.gnupg -u $gpgkeyf --batch --detach-sign $pkgfile 2>> $logfile && success || error

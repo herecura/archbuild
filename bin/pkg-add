@@ -29,7 +29,24 @@ fi
 
 for _arch in ${arch[@]}; do
     for _partialpkg in ${pkgname[@]}; do
-        tstpkg="${_partialpkg}-${pkgver}-${pkgrel}-${_arch}.pkg.tar.xz"
+        if [[ "$arch" == "any" ]]; then
+            pkgarch="any"
+        else
+            pkgarch="$_arch"
+        fi
+
+        if [[ ! -z "$epoch" ]]; then
+            pkgversion="$epoch:$pkgver"
+        else
+            pkgversion="$pkgver"
+        fi
+
+        tstpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        if [[ -e "${pkgpool}/${tstpkg}" ]]; then
+            errmsg "package $tstpkg already exists"
+            res=250
+        fi
+        tstpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.zst"
         if [[ -e "${pkgpool}/${tstpkg}" ]]; then
             errmsg "package $tstpkg already exists"
             res=250
@@ -38,7 +55,7 @@ for _arch in ${arch[@]}; do
 done
 
 if [[ $res -ne 0 ]]; then
-    rm -f *.pkg.tar.?z
+    rm -f *.pkg.tar.*
     rm -f *.log
     exit $res
 fi
@@ -46,7 +63,7 @@ fi
 gpgsign
 
 msg "move packages into package pool"
-mv *.pkg.tar.xz *.pkg.tar.xz.sig ${pkgpool}
+mv $(ls -1 | grep 'pkg.tar.[a-z]\+\(.sig\)\?$') ${pkgpool}
 res=$?
 msg "remove logs"
 rm *.log
@@ -100,7 +117,10 @@ for _arch in ${pkgbuildarch[@]}; do
             pkgversion="$pkgver"
         fi
 
-        archpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        archpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.zst"
+        if [[ ! -e "$pkgpoolvsrepo/$archpkg" ]]; then
+            archpkg="${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}.pkg.tar.xz"
+        fi
         msg "$archpkg"
 
         archpkgfile="$pkgpoolvsrepo/$archpkg"
@@ -109,7 +129,7 @@ for _arch in ${pkgbuildarch[@]}; do
             archpackages+=("$archpkg")
             ln -s $archpkgfile
             ln -s ${archpkgfile}.sig
-            toremove=$(ls ${_partialpkg}*.pkg.tar.?z* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._:]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\..z/" | grep -v -e "${_partialpkg}-${pkgversion}-${pkgrel}-${pkgarch}\.pkg\.tar\..z" 2>/dev/null)
+            toremove=$(ls ${_partialpkg}*.pkg.tar.* | perl -ne "print if /${_partialpkg}-[a-zA-Z0-9\._:]*?-[a-zA-Z0-9\._]*?-[a-zA-Z0-9\._]*?\.pkg\.tar\.[a-z]+/" | grep -v -e "${archpkg//\./\\\.}" 2>/dev/null)
             if [ $? -eq 0 ]; then
                 echo $toremove
                 rm $toremove

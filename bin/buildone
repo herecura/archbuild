@@ -55,7 +55,7 @@ done
 
 if [[ ${mkres} -ne 0 ]]; then
     # make sure there are no pkg files
-    rm -f *.pkg.tar.?z
+    rm -f *.pkg.tar.*
 fi
 
 if [[ "${mailto}" != "" ]]; then
